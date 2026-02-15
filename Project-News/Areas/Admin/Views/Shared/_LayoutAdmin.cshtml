@@ -1,0 +1,280 @@
+@using Microsoft.AspNetCore.Identity
+@using TechNews.Domain.Entities
+@inject UserManager<User> UserManager
+
+@{
+    var currentUser = await UserManager.GetUserAsync(User);
+    var fullName = currentUser?.FullName ?? User.Identity?.Name ?? "Admin";
+    var avatarUrl = currentUser?.Avatar ?? $"https://ui-avatars.com/api/?name={fullName}&background=9f224e&color=fff";
+    var role = "Quản trị viên"; // Simplified for now, or fetch roles
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Quản trị</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+         tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#9f224e', // VnExpress-like Red/Maroon
+                        secondary: '#80CAEE',
+                        stroke: '#E2E8F0',
+                        'meta-4': '#313D4A', 
+                        success: '#219653',
+                        danger: '#D34053',
+                        warning: '#FFA70B',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Vue 3 & Router -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.js"></script>
+    
+    <!-- CKEditor 5 -->
+    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/44.1.0/ckeditor5.css" />
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tạm thời load CKEditor global script để dùng trong Vue component cho dễ -->
+    <script type="importmap">
+        {
+            "imports": {
+                "ckeditor5": "https://cdn.ckeditor.com/ckeditor5/44.1.0/ckeditor5.js",
+                "ckeditor5/": "https://cdn.ckeditor.com/ckeditor5/44.1.0/"
+            }
+        }
+    </script>
+
+    <style>
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Active Link Style */
+        .router-link-active { 
+            color: #9f224e !important; 
+            background-color: #ffe4e6 !important; /* Lighter red bg for better contrast */
+        }
+        
+        /* CustomScroll */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+<body class="bg-gray-100 text-slate-900">
+    <div id="app" class="flex h-screen overflow-hidden">
+        
+        <!-- Sidebar (LIGHT MODE) -->
+        <aside class="absolute left-0 top-0 z-50 flex h-screen w-72 flex-col overflow-y-hidden bg-white border-r border-stroke duration-300 ease-linear lg:static lg:translate-x-0">
+            <div class="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5 border-b border-stroke">
+                <a href="/Admin/Dashboard" class="flex items-center gap-2 text-2xl font-bold text-black">
+                    <div class="flex h-10 w-10 items-center justify-center rounded bg-primary text-white">
+                        <i class="bi bi-grid-fill"></i>
+                    </div>
+                    <span>TechNews</span>
+                </a>
+            </div>
+
+            <div class="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
+                <nav class="mt-5 px-4 py-4 lg:mt-9 lg:px-6">
+                    <div>
+                        <h3 class="mb-4 ml-4 text-sm font-medium text-slate-400">MENU CHÍNH</h3>
+                        <ul class="mb-6 flex flex-col gap-1.5">
+                            
+                            <!-- Dashboard -->
+                            <li>
+                            <!-- Dashboard -->
+                            <li>
+                                <router-link to="/Admin/Dashboard" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                   <i class="bi bi-speedometer2 text-lg"></i> Bảng điều khiển
+                                </router-link>
+                            </li>
+
+                            <!-- Posts -->
+                            <li>
+                                <router-link to="/Admin/Post" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                   <i class="bi bi-file-text text-lg"></i> Bài viết
+                                </router-link>
+                            </li>
+
+                             <!-- Categories -->
+                            <li>
+                                <router-link to="/Admin/Category" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                   <i class="bi bi-folder text-lg"></i> Danh mục
+                                </router-link>
+                            </li>
+
+                            <!-- Tags -->
+                            <li>
+                                <router-link to="/Admin/Tag" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                   <i class="bi bi-tags text-lg"></i> Thẻ (Tags)
+                                </router-link>
+                            </li>
+                            
+                            <!-- Media -->
+                            <li>
+                                <router-link to="/Admin/Media" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                   <i class="bi bi-images text-lg"></i> Thư viện
+                                </router-link>
+                            </li>
+
+                            <!-- Users -->
+                            <li>
+                                <router-link to="/Admin/User" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                   <i class="bi bi-people text-lg"></i> Người dùng
+                                </router-link>
+                            </li>
+
+                            <!-- Comments -->
+                            <li>
+                                <router-link to="/Admin/Comment" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                   <i class="bi bi-chat-dots text-lg"></i> Bình luận
+                                </router-link>
+                            </li>
+
+
+
+
+
+                            <!-- Menus -->
+                            <li>
+                                <router-link to="/Admin/Menu" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                   <i class="bi bi-list-nested text-lg"></i> Menu
+                                </router-link>
+                            </li>
+
+                            <!-- Newsletter -->
+                            <li>
+                                <router-link to="/Admin/Newsletter" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                   <i class="bi bi-envelope-paper text-lg"></i> Newsletter
+                                </router-link>
+                            </li>
+
+                        </ul>
+                        
+                        <h3 class="mb-4 ml-4 text-sm font-medium text-slate-400">HỆ THỐNG</h3>
+                         <ul class="mb-6 flex flex-col gap-1.5">
+                            <li>
+                                <a href="/" target="_blank" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-[#9f224e] duration-300 ease-in-out hover:bg-red-50">
+                                   <i class="bi bi-box-arrow-up-right text-lg"></i> Xem trang chủ
+                                </a>
+                            </li>
+                            <li>
+                                <router-link to="/Admin/Settings" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                   <i class="bi bi-gear text-lg"></i> Cấu hình
+                                </router-link>
+                            </li>
+                            <li>
+                                <router-link to="/Admin/System" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                   <i class="bi bi-hdd-rack text-lg"></i> Bảo trì & Logs
+                                </router-link>
+                            </li>
+                         </ul>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <div class="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+            <!-- Header -->
+            <header class="sticky top-0 z-40 flex w-full bg-white drop-shadow-1 py-4 px-6 justify-between border-b border-stroke">
+                <div class="flex items-center">
+                    <!-- Global Search Removed as per user request -->
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right hidden sm:block">
+                        <span class="block text-sm font-medium text-black">@fullName</span>
+                        <span class="block text-xs font-medium text-slate-500">@role</span>
+                    </div>
+                    <div class="relative group">
+                        <img src="@avatarUrl" class="h-10 w-10 rounded-full cursor-pointer object-cover border border-stroke" />
+                        <!-- Dropdown -->
+                        <div class="absolute right-0 mt-2 w-48 bg-white border border-stroke rounded shadow-lg hidden group-hover:block">
+                            <form action="/Identity/Account/Logout" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-100">Đăng xuất</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content: Router View -->
+            <main class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 w-full bg-gray-50 h-full">
+                <!-- Vue Router Outlet -->
+                <router-view></router-view>
+                
+                <!-- RenderBody currently renders empty Spa.cshtml content, so it's safe to keep for MVC fallback logic if needed later, 
+                     but for now it's just a placeholder. -->
+                <div style="display:none">@RenderBody()</div> 
+            </main>
+        </div>
+    </div>
+
+    <!-- App Logic -->
+    <script type="module" src="/js/admin/spa-app.js"></script>
+
+    <script>
+        // Global SweetAlert Handler for TempData
+        document.addEventListener('DOMContentLoaded', function () {
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: '@TempData["SuccessMessage"]',
+                    confirmButtonColor: '#9f224e'
+                });
+                </text>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: '@TempData["ErrorMessage"]',
+                    confirmButtonColor: '#d33'
+                });
+                </text>
+            }
+        });
+
+        // Global Delete Confirmation
+        function confirmDelete(url) {
+            Swal.fire({
+                title: 'Bạn có chắc chắn?',
+                text: "Hành động này không thể hoàn tác!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa ngay',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            })
+        }
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

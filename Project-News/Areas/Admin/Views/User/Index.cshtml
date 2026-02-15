@@ -1,0 +1,81 @@
+@using Microsoft.AspNetCore.Identity
+@using TechNews.Domain.Entities
+@inject UserManager<User> UserManager
+@{
+    ViewData["Title"] = "Quản lý Người dùng";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var users = UserManager.Users.ToList();
+}
+
+<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <h2 class="text-title-md2 font-bold text-black dark:text-white">
+        Danh sách Người dùng
+    </h2>
+    <nav>
+        <ol class="flex items-center gap-2">
+            <li><a class="font-medium" href="/Admin/Dashboard">Dashboard /</a></li>
+            <li class="font-medium text-primary">Người dùng</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+    <div class="py-6 px-4 md:px-6 xl:px-7.5">
+        <h4 class="text-xl font-semibold text-black dark:text-white">
+            Tất cả người dùng (@users.Count)
+        </h4>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full table-auto">
+            <thead>
+                <tr class="bg-gray-2 text-left dark:bg-meta-4">
+                    <th class="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white xl:pl-11">User</th>
+                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Email</th>
+                     <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Role</th>
+                    <th class="py-4 px-4 font-medium text-black dark:text-white">Status</th>
+                    <th class="py-4 px-4 font-medium text-black dark:text-white">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in users)
+                {
+                    <tr class="border-b border-stroke pl-4 dark:border-strokedark hover:bg-gray-50">
+                        <td class="py-5 px-4 pl-9 xl:pl-11">
+                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+                                <div class="h-10 w-10 overflow-hidden rounded-full">
+                                    <img src="@(user.Avatar ?? $"https://ui-avatars.com/api/?name={user.FullName}&background=random")" alt="User" />
+                                </div>
+                                <p class="text-sm text-black dark:text-white">@user.FullName</p>
+                            </div>
+                        </td>
+                        <td class="py-5 px-4">
+                            <p class="text-sm text-black dark:text-white">@user.Email</p>
+                        </td>
+                         <td class="py-5 px-4">
+                            <span class="inline-flex rounded-full bg-primary bg-opacity-10 py-1 px-3 text-sm font-medium text-primary">
+                                User
+                            </span>
+                        </td>
+                        <td class="py-5 px-4">
+                             @if (user.EmailConfirmed)
+                            {
+                                <p class="inline-flex rounded-full bg-success bg-opacity-10 py-1 px-3 text-sm font-medium text-success">Verified</p>
+                            }
+                            else
+                            {
+                                <p class="inline-flex rounded-full bg-warning bg-opacity-10 py-1 px-3 text-sm font-medium text-warning">Unverified</p>
+                            }
+                        </td>
+                        <td class="py-5 px-4">
+                            <div class="flex items-center space-x-3.5">
+                                <button class="hover:text-primary"><i class="bi bi-eye"></i></button>
+                                <button class="hover:text-primary"><i class="bi bi-pencil"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

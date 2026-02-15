@@ -1,0 +1,72 @@
+@model List<TechNews.Domain.Entities.Post>
+@{
+    ViewData["Title"] = "Thẻ: " + ViewBag.TagName;
+}
+
+<div class="max-w-[1280px] mx-auto px-4 py-8">
+    <div class="mb-8 border-b border-gray-200 pb-4 flex items-baseline justify-between">
+        <h1 class="text-3xl font-bold text-slate-800">
+            <span class="text-[#9f224e]">#</span> @ViewBag.TagName
+        </h1>
+        <span class="text-slate-500 text-sm">Kết quả tìm kiếm cho thẻ</span>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @foreach (var post in Model)
+            {
+                <div class="group flex flex-col h-full bg-white rounded-2xl shadow-sm hover:shadow-soft transition-all duration-300 border border-gray-100 overflow-hidden">
+                    <a href="/post/@post.Slug" class="relative aspect-video overflow-hidden">
+                        <div class="absolute inset-0 bg-gray-900/10 group-hover:bg-transparent transition-colors z-10"></div>
+                        <img src="@post.Thumbnail" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                        @if(post.Category != null) {
+                            <span class="absolute top-4 left-4 z-20 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-800 shadow-sm">
+                                @post.Category.Name
+                            </span>
+                        }
+                    </a>
+                    <div class="p-6 flex flex-col flex-1">
+                        <div class="flex items-center gap-2 mb-3 text-xs text-slate-500 font-medium font-sans">
+                            <span class="text-[#9f224e] bg-[#9f224e]/5 px-2 py-0.5 rounded">
+                                @post.CreatedDate.ToString("dd MMMM, yyyy")
+                            </span>
+                             <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                            <span>@post.Author?.UserName</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3 leading-snug group-hover:text-[#9f224e] transition-colors line-clamp-2">
+                            <a href="/post/@post.Slug">@post.Title</a>
+                        </h3>
+                        <p class="text-slate-500 text-sm leading-relaxed line-clamp-3 mb-4 flex-1">
+                            @post.ShortDescription
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (ViewBag.TotalPages > 1)
+        {
+             <div class="flex justify-center mt-12 gap-2">
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <a href="?page=@i" class="px-4 py-2 rounded-lg font-bold border transition-colors @(i == ViewBag.CurrentPage ? "bg-[#9f224e] text-white border-[#9f224e]" : "bg-white text-slate-700 border-gray-200 hover:bg-gray-50")">
+                        @i
+                    </a>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
+                <i class="bi bi-tags text-4xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Chưa có bài viết nào</h3>
+            <p class="text-slate-500">Chúng tôi chưa tìm thấy bài viết nào gắn thẻ này.</p>
+            <a href="/" class="inline-block mt-6 px-6 py-2 bg-[#9f224e] text-white rounded-full font-bold hover:bg-[#851b41] transition">Về trang chủ</a>
+        </div>
+    }
+</div>

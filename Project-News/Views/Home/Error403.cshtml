@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "403 - Không có quyền truy cập";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="min-h-[60vh] flex items-center justify-center">
+    <div class="text-center px-6">
+        <div class="text-8xl font-extrabold text-yellow-500 mb-4">403</div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Không có quyền truy cập</h1>
+        <p class="text-gray-500 mb-8 max-w-md mx-auto">
+            Bạn không có quyền truy cập trang này. Vui lòng đăng nhập hoặc liên hệ quản trị viên.
+        </p>
+        <div class="flex gap-4 justify-center">
+            <a href="/" class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-all shadow-lg">
+                <i class="bi bi-house-door"></i> Về trang chủ
+            </a>
+            <a href="/Identity/Account/Login" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all">
+                <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "404 - Không tìm thấy";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="min-h-[60vh] flex items-center justify-center">
+    <div class="text-center px-6">
+        <div class="text-8xl font-extrabold text-primary mb-4">404</div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Trang không tồn tại</h1>
+        <p class="text-gray-500 mb-8 max-w-md mx-auto">
+            Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.
+        </p>
+        <div class="flex gap-4 justify-center">
+            <a href="/" class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-all shadow-lg">
+                <i class="bi bi-house-door"></i> Về trang chủ
+            </a>
+            <a href="javascript:history.back()" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all">
+                <i class="bi bi-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
+</div>

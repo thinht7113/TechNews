@@ -1,0 +1,151 @@
+@model TechNews.Domain.Entities.Post
+@{
+    ViewData["Title"] = Model.MetaTitle ?? Model.Title;
+    ViewData["MetaDescription"] = Model.MetaDescription ?? Model.ShortDescription;
+    var relatedPosts = ViewBag.RelatedPosts as List<TechNews.Domain.Entities.Post>;
+}
+
+<div class="max-w-4xl mx-auto">
+    <!-- Breadcrumb -->
+    <nav class="text-sm font-medium text-gray-500 mb-6 flex gap-2 items-center">
+        <a href="/" class="hover:text-primary transition">Trang chủ</a>
+        <span>/</span>
+        <a href="#" class="hover:text-primary transition">@Model.Category?.Name</a>
+        <span>/</span>
+        <span class="text-gray-800 line-clamp-1">@Model.Title</span>
+    </nav>
+
+    <!-- Header -->
+    <header class="mb-8">
+        <div class="flex gap-2 mb-4">
+             <span class="bg-blue-100 text-primary text-xs font-bold px-3 py-1 rounded-full">@Model.Category?.Name</span>
+             <span class="text-gray-500 text-xs py-1"><i class="bi bi-clock"></i> @Model.CreatedDate.ToString("dd/MM/yyyy")</span>
+             <span class="text-gray-500 text-xs py-1"><i class="bi bi-eye"></i> @Model.ViewCount</span>
+        </div>
+        
+        <h1 class="text-3xl md:text-5xl font-bold font-serif text-gray-900 leading-tight mb-6">
+            @Model.Title
+        </h1>
+
+        <p class="text-lg md:text-xl text-gray-600 leading-relaxed italic border-l-4 border-primary pl-4">
+            @Model.ShortDescription
+        </p>
+    </header>
+
+    <!-- Featured Image -->
+    @if (!string.IsNullOrEmpty(Model.Thumbnail))
+    {
+        <figure class="mb-10">
+            <img src="@Model.Thumbnail" alt="@Model.Title" class="w-full rounded-xl shadow-lg object-cover max-h-[500px]">
+            <figcaption class="text-center text-sm text-gray-500 mt-2 italic">@Model.Title</figcaption>
+        </figure>
+    }
+
+    <!-- Content -->
+    <article class="prose prose-lg prose-blue max-w-none mb-12 font-serif text-gray-800 group-hover:text-gray-900">
+        @Html.Raw(Model.Content)
+    </article>
+
+    <!-- Share & Tags -->
+    <div class="border-t border-b border-gray-200 py-6 mb-12 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex gap-2">
+            <span class="font-bold text-gray-700">Tags:</span>
+            @if (!string.IsNullOrEmpty(Model.Tags))
+            {
+                @foreach(var tag in Model.Tags.Split(','))
+                {
+                    <a href="#" class="text-sm bg-gray-100 text-gray-600 px-3 py-1 rounded hover:bg-gray-200 transition">#@tag.Trim()</a>
+                }
+            }
+        </div>
+        <div class="flex gap-3">
+            <span class="font-medium text-gray-700">Chia sẻ:</span>
+            <button class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition"><i class="bi bi-facebook"></i></button>
+            <button class="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center hover:bg-sky-600 transition"><i class="bi bi-twitter"></i></button>
+            <button class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center hover:bg-red-700 transition"><i class="bi bi-pinterest"></i></button>
+        </div>
+    </div>
+
+    <!-- Related Posts -->
+    @if (relatedPosts != null && relatedPosts.Any())
+    {
+        <section class="bg-gray-50 p-8 rounded-2xl">
+            <h3 class="font-bold text-2xl text-gray-800 mb-6 border-l-4 border-primary pl-3">Bài viết liên quan</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                @foreach (var post in relatedPosts)
+                {
+                    <div class="group">
+                        <div class="overflow-hidden rounded-lg mb-3 h-48">
+                            <img src="@post.Thumbnail" alt="@post.Title" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        </div>
+                        <h4 class="font-bold text-gray-900 leading-snug mb-2 group-hover:text-primary transition">
+                            <a href="/post/@post.Slug">@post.Title</a>
+                        </h4>
+                        <span class="text-xs text-gray-500">@post.CreatedDate.ToString("dd/MM/yyyy")</span>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+    
+    <!-- Comment Section Placeholder -->
+    <!-- Comment Section -->
+    <div class="mt-12 bg-white rounded-2xl shadow-sm p-8 border border-gray-100" id="comments-section">
+         <h3 class="font-bold text-2xl text-gray-800 mb-6 flex items-center gap-2">
+             Bình luận <span class="text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full">@Model.Comments?.Count()</span>
+         </h3>
+         
+         <!-- Comment List -->
+         <div id="comment-list" class="space-y-6 mb-10">
+             @if (Model.Comments != null && Model.Comments.Any())
+             {
+                 foreach (var comment in Model.Comments)
+                 {
+                     @await Html.PartialAsync("_CommentItemPartial", comment)
+                 }
+             }
+             else
+             {
+                 <p class="text-gray-500 italic text-center py-4" id="no-comments-msg">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+             }
+         </div>
+
+         <!-- Comment Form -->
+         @if (User.Identity.IsAuthenticated)
+         {
+             <form hx-post="/Comment/Add" 
+                   hx-target="#comment-list" 
+                   hx-swap="afterbegin"
+                   hx-on::after-request="this.reset(); document.getElementById('no-comments-msg')?.remove();"
+                   class="relative">
+                 @Html.AntiForgeryToken()
+                 <input type="hidden" name="postId" value="@Model.Id" />
+                 
+                 <div class="flex gap-4 items-start">
+                     <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold flex-shrink-0">
+                         @(User.Identity.Name?.FirstOrDefault() ?? 'U')
+                     </div>
+                     <div class="flex-grow">
+                         <textarea name="content" rows="3" placeholder="Chia sẻ suy nghĩ của bạn..." 
+                                   class="w-full bg-gray-50 border-0 rounded-xl p-4 focus:ring-2 focus:ring-primary/20 transition resize-none text-gray-700 placeholder-gray-400"></textarea>
+                         <div class="mt-2 text-right">
+                             <button type="submit" class="bg-primary text-white px-6 py-2 rounded-full font-bold text-sm hover:shadow-lg hover:bg-opacity-90 transition">
+                                 Gửi bình luận
+                             </button>
+                         </div>
+                     </div>
+                 </div>
+             </form>
+         }
+         else
+         {
+             <div class="text-center bg-gray-50 rounded-xl p-6 border border-dashed border-gray-300">
+                 <p class="text-gray-600 mb-4">Vui lòng đăng nhập để bình luận.</p>
+                 <a href="/Identity/Account/Login?returnUrl=@Url.Action("Detail", "Post", new { slug = Model.Slug })" 
+                    class="inline-block px-6 py-2 bg-slate-900 text-white rounded-full font-bold hover:bg-slate-800 transition">
+                     Đăng nhập ngay
+                 </a>
+             </div>
+         }
+    </div>
+</div>

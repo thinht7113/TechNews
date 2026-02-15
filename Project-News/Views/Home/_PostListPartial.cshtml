@@ -1,0 +1,22 @@
+@model List<TechNews.Domain.Entities.Post>
+
+@foreach (var post in Model)
+{
+    @await Html.PartialAsync("_PostItemPartial", post)
+}
+
+<!-- HTMX Infinite Scroll Trigger: Only render if we brought back a full page, 
+     otherwise we assume end of list. Or simpler, let the button be outside.
+     Actually, "Load More" button usually stays at bottom.
+     Strategy: Replace the button with next page results + new button.
+-->
+@if (Model.Count >= 10)
+{
+    <div id="load-more-container" class="mt-8 text-center" hx-swap-oob="true">
+        <!-- Out of Band Swap to update the button at the bottom -->
+         <!-- Wait, OOB might be complex. Let's stick to simple append and replacing the button itself if it was inside the target. 
+              But here we are returning just the list. 
+              Let's make the Load More button part of Index, and it appends to the list.
+         -->
+    </div>
+}
