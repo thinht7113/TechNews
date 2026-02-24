@@ -15,6 +15,11 @@ import MenuBuilder from './components/MenuBuilder.js';
 import TagList from './components/TagList.js';
 import NewsletterManager from './components/NewsletterManager.js';
 
+// Content Marketing Platform Components
+import Workflow from './components/Workflow.js';
+import Analytics from './components/Analytics.js';
+import ContentCalendar from './components/ContentCalendar.js';
+
 const { createApp } = Vue;
 const { createRouter, createWebHistory } = VueRouter;
 
@@ -38,6 +43,12 @@ const routes = [
     { path: '/Admin/Menu', component: MenuBuilder },
     { path: '/Admin/Tag', component: TagList },
     { path: '/Admin/Newsletter', component: NewsletterManager },
+
+    // Content Marketing Platform Routes
+    { path: '/Admin/Workflow', component: Workflow },
+    { path: '/Admin/Analytics', component: Analytics },
+    { path: '/Admin/Calendar', component: ContentCalendar },
+
     { path: '/:pathMatch(.*)*', redirect: '/Admin/Dashboard' }
 ];
 

@@ -24,8 +24,15 @@ namespace TechNews.Domain.Entities
         
         public string AuthorId { get; set; }
         public virtual User Author { get; set; }
+
+        // Editorial Workflow
+        public string? AssignedEditorId { get; set; }
+        public virtual User? AssignedEditor { get; set; }
+        public DateTime? ScheduledPublishDate { get; set; }
+        public string? ReviewNote { get; set; }
         
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public virtual ICollection<PostTag> PostTags { get; set; } = new List<PostTag>();
+        public virtual ICollection<WorkflowLog> WorkflowLogs { get; set; } = new List<WorkflowLog>();
     }
 }

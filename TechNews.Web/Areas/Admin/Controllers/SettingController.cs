@@ -36,7 +36,10 @@ namespace TechNews.Web.Areas.Admin.Controllers
                 new SystemSetting { Key = "SmtpPort", Value = "587", DisplayName = "SMTP Port", GroupName = "Email (Newsletter)", Type = "text" },
                 new SystemSetting { Key = "SmtpUser", Value = "", DisplayName = "Email gửi (Gmail)", GroupName = "Email (Newsletter)", Type = "text" },
                 new SystemSetting { Key = "SmtpPass", Value = "", DisplayName = "Mật khẩu ứng dụng", GroupName = "Email (Newsletter)", Type = "password" },
-                new SystemSetting { Key = "SmtpFromName", Value = "TechNews", DisplayName = "Tên người gửi", GroupName = "Email (Newsletter)", Type = "text" }
+                new SystemSetting { Key = "SmtpFromName", Value = "TechNews", DisplayName = "Tên người gửi", GroupName = "Email (Newsletter)", Type = "text" },
+                new SystemSetting { Key = "AiProvider", Value = "gemini", DisplayName = "AI Provider (openai / gemini)", GroupName = "AI (Trợ lý viết bài)", Type = "text" },
+                new SystemSetting { Key = "AiApiKey", Value = "", DisplayName = "API Key", GroupName = "AI (Trợ lý viết bài)", Type = "password" },
+                new SystemSetting { Key = "AiModel", Value = "gemini-2.0-flash", DisplayName = "Model (vd: gpt-4o-mini, gemini-2.0-flash)", GroupName = "AI (Trợ lý viết bài)", Type = "text" }
             };
 
             var existingKeys = await _context.Settings.Select(s => s.Key).ToListAsync();

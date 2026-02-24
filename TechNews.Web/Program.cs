@@ -39,6 +39,11 @@ builder.Services.AddScoped<TechNews.Application.Interfaces.IPostService, TechNew
 builder.Services.AddScoped<TechNews.Application.Interfaces.ICategoryService, TechNews.Application.Services.CategoryService>();
 builder.Services.AddScoped<TechNews.Application.Interfaces.ICommentService, TechNews.Application.Services.CommentService>();
 builder.Services.AddScoped<TechNews.Application.Interfaces.IEmailService, TechNews.Web.Services.EmailService>();
+builder.Services.AddScoped<TechNews.Application.Interfaces.IWorkflowService, TechNews.Application.Services.WorkflowService>();
+builder.Services.AddScoped<TechNews.Application.Interfaces.ISeoService, TechNews.Application.Services.SeoService>();
+builder.Services.AddScoped<TechNews.Application.Interfaces.IAnalyticsService, TechNews.Application.Services.AnalyticsService>();
+builder.Services.AddHttpClient<TechNews.Application.Interfaces.IAiService, TechNews.Application.Services.AiService>();
+builder.Services.AddHostedService<TechNews.Web.Services.ScheduledPublishService>();
 builder.Services.AddMemoryCache();
 
 builder.Services.AddControllersWithViews()
@@ -66,6 +71,11 @@ using (var scope = app.Services.CreateScope())
         var roleManager = services.GetRequiredService<RoleManager<Role>>();
         context.Database.Migrate();
         await TechNews.Infrastructure.Data.DataSeeder.SeedAsync(context, userManager, roleManager);
+        // Seed Editor role
+        if (!await roleManager.RoleExistsAsync("Editor"))
+        {
+            await roleManager.CreateAsync(new TechNews.Domain.Entities.Role { Name = "Editor" });
+        }
     }
     catch (Exception ex)
     {

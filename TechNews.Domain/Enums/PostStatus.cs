@@ -6,6 +6,9 @@ namespace TechNews.Domain.Enums
         Published = 1,
         Archived = 2,
         Hidden = 3,
-        Pending = 4
+        Pending = 4,
+        InReview = 5,
+        Rejected = 6,
+        Scheduled = 7
     }
 }

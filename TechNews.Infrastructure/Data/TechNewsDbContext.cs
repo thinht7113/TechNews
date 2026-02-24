@@ -21,6 +21,8 @@ namespace TechNews.Infrastructure.Data
         public DbSet<SystemSetting> Settings { get; set; }
         public DbSet<PostRevision> PostRevisions { get; set; }
         public DbSet<Subscriber> Subscribers { get; set; }
+        public DbSet<WorkflowLog> WorkflowLogs { get; set; }
+        public DbSet<PageView> PageViews { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -42,6 +44,39 @@ namespace TechNews.Infrastructure.Data
                     .WithMany()
                     .HasForeignKey(d => d.AuthorId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.AssignedEditor)
+                    .WithMany()
+                    .HasForeignKey(d => d.AssignedEditorId)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .IsRequired(false);
+            });
+
+            builder.Entity<WorkflowLog>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(d => d.Post)
+                    .WithMany(p => p.WorkflowLogs)
+                    .HasForeignKey(d => d.PostId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(d => d.User)
+                    .WithMany()
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(e => new { e.PostId, e.CreatedDate });
+            });
+
+            builder.Entity<PageView>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(d => d.Post)
+                    .WithMany()
+                    .HasForeignKey(d => d.PostId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(e => new { e.PostId, e.CreatedDate });
             });
 
             builder.Entity<Category>(entity =>
