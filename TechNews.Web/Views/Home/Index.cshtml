@@ -1,0 +1,220 @@
+﻿@model TechNews.Web.Models.HomeIndexViewModel
+@{
+    ViewData["Title"] = "TechNews - Tương lai công nghệ";
+}
+
+<!-- Main Container: White Background, Classic Layout -->
+<div class="bg-white min-h-screen font-sans text-slate-900">
+    
+    <div class="max-w-[1280px] mx-auto px-4 py-8">
+        
+        <!-- HERO SECTION -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 border-b border-gray-100 pb-12">
+            
+            <!-- Main Featured Article (Left - 8 cols) -->
+            <div class="lg:col-span-8 group">
+                @if (Model.FeaturedMain != null)
+                {
+                    <a href="/post/@Model.FeaturedMain.Slug" class="block h-full">
+                        <div class="relative overflow-hidden rounded-xl mb-4 aspect-video">
+                            <img src="@Model.FeaturedMain.Thumbnail" alt="@Model.FeaturedMain.Title" 
+                                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                            <span class="absolute bottom-4 left-4 bg-[#9f224e] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                @Model.FeaturedMain.Category?.Name
+                            </span>
+                        </div>
+                        <h1 class="text-3xl md:text-4xl font-extrabold leading-tight mb-3 group-hover:text-[#9f224e] transition-colors">
+                            @Model.FeaturedMain.Title
+                        </h1>
+                        <p class="text-gray-600 text-lg line-clamp-3 leading-relaxed">
+                            @Model.FeaturedMain.ShortDescription
+                        </p>
+                    </a>
+                }
+            </div>
+
+            <!-- Sub Featured Articles (Right - 4 cols) -->
+            <div class="lg:col-span-4 flex flex-col gap-6">
+                @foreach (var item in Model.FeaturedSub)
+                {
+                    <article class="group flex gap-4 items-start pb-6 border-b border-gray-100 last:border-0 last:pb-0">
+                         <a href="/post/@item.Slug" class="shrink-0 w-24 h-24 rounded-lg overflow-hidden relative">
+                             <img src="@item.Thumbnail" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                         </a>
+                         <div>
+                             <a href="/category/@item.Category?.Slug" class="text-xs font-bold text-[#9f224e] uppercase mb-1 block">@item.Category?.Name</a>
+                             <h3 class="font-bold text-lg leading-snug group-hover:text-[#9f224e] transition-colors line-clamp-3">
+                                 <a href="/post/@item.Slug">@item.Title</a>
+                             </h3>
+                             <span class="text-xs text-gray-400 mt-1 block">@item.CreatedDate.ToString("dd/MM/yyyy")</span>
+                         </div>
+                    </article>
+                }
+            </div>
+
+        </section>
+
+        <!-- CONTENT BODY -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            
+            <!-- LEFT COLUMN: Dynamic Categories (8 cols) -->
+            <div class="lg:col-span-8 space-y-16">
+                
+                @foreach (var catSection in Model.CategorySections)
+                {
+                    <section>
+                        <!-- Section Header -->
+                        <div class="flex items-center justify-between mb-6 border-l-4 border-[#9f224e] pl-4">
+                            <h2 class="text-2xl font-bold uppercase tracking-tight">
+                                <a href="/category/@catSection.CategorySlug" class="hover:text-[#9f224e]">@catSection.CategoryName</a>
+                            </h2>
+                            <a href="/category/@catSection.CategorySlug" class="text-sm font-semibold text-gray-500 hover:text-[#9f224e] flex items-center gap-1">
+                                Xem tất cả <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+
+                        <!-- Posts Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-10">
+                            <!-- First Post (Big) -->
+                            @if(catSection.Posts.Any())
+                            {
+                                var first = catSection.Posts.First();
+                                <article class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 group mb-4">
+                                     <a href="/post/@first.Slug" class="block overflow-hidden rounded-xl aspect-[16/9] md:aspect-auto">
+                                         <img src="@first.Thumbnail" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                     </a>
+                                     <div class="flex flex-col justify-center">
+                                         <a href="/post/@first.Slug">
+                                             <h3 class="text-xl font-bold mb-3 leading-snug group-hover:text-[#9f224e] transition-colors">
+                                                 @first.Title
+                                             </h3>
+                                             <p class="text-gray-600 text-sm line-clamp-3 mb-3">@first.ShortDescription</p>
+                                             <span class="text-xs text-gray-400">@first.CreatedDate.ToString("dd/MM/yyyy") &bull; @first.ViewCount lượt xem</span>
+                                         </a>
+                                     </div>
+                                </article>
+                            }
+
+                            <!-- Other Posts (Grid) -->
+                            @foreach (var post in catSection.Posts.Skip(1))
+                            {
+                                <article class="group">
+                                    <a href="/post/@post.Slug" class="block aspect-[3/2] overflow-hidden rounded-lg mb-3">
+                                        <img src="@post.Thumbnail" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                    </a>
+                                    <h3 class="font-bold text-base leading-snug mb-2 group-hover:text-[#9f224e] transition-colors line-clamp-2">
+                                        <a href="/post/@post.Slug">@post.Title</a>
+                                    </h3>
+                                    <div class="flex items-center text-xs text-gray-400">
+                                         <span>@post.CreatedDate.ToString("dd/MM")</span>
+                                    </div>
+                                </article>
+                            }
+                        </div>
+                    </section>
+                }
+
+                @if (Model.LatestStream.Any())
+                {
+                    <div class="mt-8 text-center" id="load-more-container">
+                        <button id="btn-load-more" class="px-6 py-2 border border-gray-300 rounded-full font-bold text-slate-600 hover:bg-gray-50 hover:text-primary transition-colors flex items-center gap-2 mx-auto">
+                            <span>Xem thêm bài viết</span>
+                            <i class="bi bi-arrow-down"></i>
+                        </button>
+                    </div>
+                }
+
+            </div>
+
+@section Scripts {
+    <script>
+        let page = 1;
+        const btnLoadMore = document.getElementById('btn-load-more');
+        const container = document.getElementById('latest-posts-grid');
+        const loadMoreContainer = document.getElementById('load-more-container');
+
+        if (btnLoadMore) {
+            btnLoadMore.addEventListener('click', async () => {
+                const icon = btnLoadMore.querySelector('i');
+                const text = btnLoadMore.querySelector('span');
+                const originalIcon = icon.className;
+                
+                // Loading state
+                btnLoadMore.disabled = true;
+                icon.className = 'bi bi-arrow-repeat animate-spin';
+                
+                try {
+                    const response = await fetch(`/Home/LoadMore?page=${page}`);
+                    
+                    if (response.status === 204) {
+                        // No more content
+                        loadMoreContainer.remove();
+                        return;
+                    }
+
+                    if (response.ok) {
+                        const html = await response.text();
+                        container.insertAdjacentHTML('beforeend', html);
+                        page++;
+                    }
+                } catch (error) {
+                    console.error('Error loading posts:', error);
+                } finally {
+                    btnLoadMore.disabled = false;
+                    icon.className = originalIcon;
+                }
+            });
+        }
+    </script>
+}
+
+            <!-- RIGHT COLUMN: Sidebar (4 cols) -->
+            <aside class="lg:col-span-4 space-y-10">
+                
+
+
+                <!-- Most Viewed Widget -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                    <h3 class="font-bold text-xl mb-6 relative inline-block">
+                        Đọc nhiều nhất
+                        <span class="absolute bottom-0 left-0 w-full h-1 bg-[#9f224e]/20"></span>
+                    </h3>
+                    
+                    <div class="flex flex-col gap-6">
+                        @for (int i = 0; i < Model.MostViewed.Count; i++)
+                        {
+                            var post = Model.MostViewed[i];
+                            <article class="flex gap-4 group items-center">
+                                <span class="text-3xl font-black text-gray-200 group-hover:text-[#9f224e] transition-colors">@(i+1)</span>
+                                <div>
+                                    <h4 class="font-bold text-sm leading-snug group-hover:text-[#9f224e] transition-colors line-clamp-2">
+                                        <a href="/post/@post.Slug">@post.Title</a>
+                                    </h4>
+                                    <span class="text-xs text-gray-400 mt-1 block">@post.ViewCount views</span>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                </div>
+
+                <!-- Tag Cloud -->
+                <div>
+                    <h3 class="font-bold text-lg mb-4 uppercase tracking-wider text-gray-500 text-xs">Từ khóa nổi bật</h3>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach (var tag in Model.TrendingTags)
+                        {
+                            <a href="/post/search?query=@tag" class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded hover:bg-[#9f224e] hover:text-white transition-colors">
+                                #@tag
+                            </a>
+                        }
+                    </div>
+                </div>
+
+
+
+            </aside>
+
+        </div>
+    </div>
+</div>
+

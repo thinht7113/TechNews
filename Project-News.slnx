@@ -1,6 +1,0 @@
-<Solution>
-  <Project Path="Project-News/Project-News.csproj" />
-  <Project Path="TechNews.Application/TechNews.Application.csproj" />
-  <Project Path="TechNews.Domain/TechNews.Domain.csproj" />
-  <Project Path="TechNews.Infrastructure/TechNews.Infrastructure.csproj" />
-</Solution>
