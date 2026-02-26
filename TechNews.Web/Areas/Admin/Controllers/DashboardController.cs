@@ -12,7 +12,7 @@ using TechNews.Domain.Enums;
 namespace TechNews.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Editor")]
     public class DashboardController : Controller
     {
         private readonly IRepository<Post> _postRepo;
