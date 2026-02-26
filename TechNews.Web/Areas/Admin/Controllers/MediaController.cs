@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace TechNews.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Editor")]
     public class MediaController : Controller
     {
         private readonly IWebHostEnvironment _env;

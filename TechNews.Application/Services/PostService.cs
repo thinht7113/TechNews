@@ -36,10 +36,17 @@ namespace TechNews.Application.Services
             _env = env;
         }
 
-        public async Task<IEnumerable<object>> GetAllPostsAsync()
+        public async Task<IEnumerable<object>> GetAllPostsAsync(string? userId = null, bool isAdmin = false)
         {
             var posts = await _postRepo.GetAllAsync(p => p.Category);
-            return posts.Where(p => !p.IsDeleted).Select(p => new {
+            var query = posts.Where(p => !p.IsDeleted);
+            
+            if (!isAdmin && !string.IsNullOrEmpty(userId))
+            {
+                query = query.Where(p => p.AuthorId == userId);
+            }
+
+            return query.Select(p => new {
                 p.Id,
                 p.Title,
                 p.Slug,
@@ -50,10 +57,13 @@ namespace TechNews.Application.Services
             }).OrderByDescending(p => p.CreatedDate);
         }
 
-        public async Task<object?> GetPostByIdAsync(int id)
+        public async Task<object?> GetPostByIdAsync(int id, string? userId = null, bool isAdmin = false)
         {
             var post = await _postRepo.GetByIdAsync(id);
             if (post == null) return null;
+
+            if (!isAdmin && !string.IsNullOrEmpty(userId) && post.AuthorId != userId)
+                throw new UnauthorizedAccessException("Bạn không có quyền truy cập bài viết này.");
 
             var category = await _categoryRepo.GetByIdAsync(post.CategoryId);
 
@@ -107,10 +117,13 @@ namespace TechNews.Application.Services
             await SyncTagsAsync(post.Id, dto.Tags);
         }
 
-        public async Task UpdatePostAsync(int id, EditPostDto dto)
+        public async Task UpdatePostAsync(int id, EditPostDto dto, string? userId = null, bool isAdmin = false)
         {
             var post = await _postRepo.GetByIdAsync(id);
             if (post == null) throw new KeyNotFoundException("Post not found");
+
+            if (!isAdmin && !string.IsNullOrEmpty(userId) && post.AuthorId != userId)
+                throw new UnauthorizedAccessException("Bạn không có quyền sửa bài viết này.");
 
             await CreateRevisionAsync(post);
 
@@ -140,20 +153,26 @@ namespace TechNews.Application.Services
             await SyncTagsAsync(post.Id, dto.Tags);
         }
 
-        public async Task DeletePostAsync(int id)
+        public async Task DeletePostAsync(int id, string? userId = null, bool isAdmin = false)
         {
             var post = await _postRepo.GetByIdAsync(id);
             if (post == null) throw new KeyNotFoundException("Post not found");
+
+            if (!isAdmin && !string.IsNullOrEmpty(userId) && post.AuthorId != userId)
+                throw new UnauthorizedAccessException("Bạn không có quyền xóa bài viết này.");
 
             post.IsDeleted = true;
             await _postRepo.UpdateAsync(post);
             await _unitOfWork.CompleteAsync();
         }
 
-        public async Task<bool> RestorePostAsync(int id)
+        public async Task<bool> RestorePostAsync(int id, string? userId = null, bool isAdmin = false)
         {
             var post = await _postRepo.GetByIdAsync(id);
             if (post == null) return false;
+
+            if (!isAdmin && !string.IsNullOrEmpty(userId) && post.AuthorId != userId)
+                throw new UnauthorizedAccessException("Bạn không có quyền khôi phục bài viết này.");
 
             post.IsDeleted = false;
             await _postRepo.UpdateAsync(post);
@@ -161,10 +180,13 @@ namespace TechNews.Application.Services
             return true;
         }
 
-        public async Task PermanentDeletePostAsync(int id)
+        public async Task PermanentDeletePostAsync(int id, string? userId = null, bool isAdmin = false)
         {
             var post = await _postRepo.GetByIdAsync(id);
             if (post == null) throw new KeyNotFoundException("Post not found");
+
+            if (!isAdmin && !string.IsNullOrEmpty(userId) && post.AuthorId != userId)
+                throw new UnauthorizedAccessException("Bạn không có quyền xóa vĩnh viễn bài viết này.");
 
             var postTags = await _postTagRepo.FindAsync(pt => pt.PostId == id);
             foreach(var pt in postTags)
@@ -182,10 +204,17 @@ namespace TechNews.Application.Services
             await _unitOfWork.CompleteAsync();
         }
 
-        public async Task<IEnumerable<object>> GetTrashAsync()
+        public async Task<IEnumerable<object>> GetTrashAsync(string? userId = null, bool isAdmin = false)
         {
             var posts = await _postRepo.GetAllAsync(p => p.Category);
-            return posts.Where(p => p.IsDeleted).Select(p => new {
+            var query = posts.Where(p => p.IsDeleted);
+            
+            if (!isAdmin && !string.IsNullOrEmpty(userId))
+            {
+                query = query.Where(p => p.AuthorId == userId);
+            }
+
+            return query.Select(p => new {
                 p.Id,
                 p.Title,
                 p.Slug,
@@ -203,13 +232,16 @@ namespace TechNews.Application.Services
                             .Select(r => new { r.Id, r.Version, r.ModifiedDate, r.Title });
         }
 
-        public async Task RestoreRevisionAsync(int revisionId)
+        public async Task RestoreRevisionAsync(int revisionId, string? userId = null, bool isAdmin = false)
         {
             var revision = await _revisionRepo.GetByIdAsync(revisionId);
             if (revision == null) throw new KeyNotFoundException("Revision not found");
 
             var post = await _postRepo.GetByIdAsync(revision.PostId);
             if (post == null) throw new KeyNotFoundException("Post not found");
+
+            if (!isAdmin && !string.IsNullOrEmpty(userId) && post.AuthorId != userId)
+                throw new UnauthorizedAccessException("Bạn không có quyền khôi phục phiên bản của bài viết này.");
 
             await CreateRevisionAsync(post);
 

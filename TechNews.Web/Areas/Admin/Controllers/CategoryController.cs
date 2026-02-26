@@ -8,7 +8,7 @@ using TechNews.Web.Areas.Admin.Models;
 namespace TechNews.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Editor")]
     public class CategoryController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -44,6 +44,7 @@ namespace TechNews.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [Route("api/category/create")]
         public async Task<IActionResult> CreateApi([FromBody] Category category)
         {
@@ -59,6 +60,7 @@ namespace TechNews.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [Route("api/category/update/{id}")]
         public async Task<IActionResult> UpdateApi(int id, [FromBody] Category model)
         {
@@ -79,6 +81,7 @@ namespace TechNews.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [Route("api/category/delete/{id}")]
         public async Task<IActionResult> DeleteApi(int id)
         {

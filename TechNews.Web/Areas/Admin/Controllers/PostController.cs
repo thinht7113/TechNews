@@ -7,7 +7,7 @@ using TechNews.Application.DTOs;
 namespace TechNews.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Editor")]
     public class PostController : Controller
     {
         private readonly IPostService _postService;
@@ -28,7 +28,10 @@ namespace TechNews.Web.Areas.Admin.Controllers
         [Route("api/post/getall")]
         public async Task<IActionResult> GetAll(int page = 1, int pageSize = 20)
         {
-            var allPosts = await _postService.GetAllPostsAsync();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isAdmin = User.IsInRole("Admin");
+
+            var allPosts = await _postService.GetAllPostsAsync(userId, isAdmin);
             var totalCount = allPosts.Count();
             var pagedPosts = allPosts.Skip((page - 1) * pageSize).Take(pageSize);
             return Json(new { data = pagedPosts, totalCount, page, pageSize, totalPages = (int)Math.Ceiling(totalCount / (double)pageSize) });
@@ -38,9 +41,19 @@ namespace TechNews.Web.Areas.Admin.Controllers
         [Route("api/post/get/{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var post = await _postService.GetPostByIdAsync(id);
-            if (post == null) return NotFound();
-            return Json(post);
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var isAdmin = User.IsInRole("Admin");
+
+                var post = await _postService.GetPostByIdAsync(id, userId, isAdmin);
+                if (post == null) return NotFound();
+                return Json(post);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new { message = ex.Message });
+            }
         }
 
         [HttpPost]
@@ -64,12 +77,19 @@ namespace TechNews.Web.Areas.Admin.Controllers
             {
                 try
                 {
-                    await _postService.UpdatePostAsync(id, model);
+                    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    var isAdmin = User.IsInRole("Admin");
+
+                    await _postService.UpdatePostAsync(id, model, userId, isAdmin);
                     return Ok(new { success = true });
                 }
                 catch (KeyNotFoundException)
                 {
                     return NotFound();
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    return StatusCode(403, new { message = ex.Message });
                 }
             }
             return BadRequest(new { message = "Dữ liệu không hợp lệ" });
@@ -89,12 +109,19 @@ namespace TechNews.Web.Areas.Admin.Controllers
         {
             try
             {
-                await _postService.RestoreRevisionAsync(revisionId);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var isAdmin = User.IsInRole("Admin");
+
+                await _postService.RestoreRevisionAsync(revisionId, userId, isAdmin);
                 return Ok(new { success = true });
             }
             catch (KeyNotFoundException)
             {
                 return NotFound();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new { message = ex.Message });
             }
         }
 
@@ -104,12 +131,19 @@ namespace TechNews.Web.Areas.Admin.Controllers
         {
             try
             {
-                await _postService.DeletePostAsync(id);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var isAdmin = User.IsInRole("Admin");
+
+                await _postService.DeletePostAsync(id, userId, isAdmin);
                 return Ok(new { success = true });
             }
             catch (KeyNotFoundException)
             {
                 return NotFound();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new { message = ex.Message });
             }
         }
 
@@ -117,7 +151,10 @@ namespace TechNews.Web.Areas.Admin.Controllers
         [Route("api/post/gettrash")]
         public async Task<IActionResult> GetTrash()
         {
-            var posts = await _postService.GetTrashAsync();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isAdmin = User.IsInRole("Admin");
+
+            var posts = await _postService.GetTrashAsync(userId, isAdmin);
             return Json(posts);
         }
 
@@ -125,9 +162,19 @@ namespace TechNews.Web.Areas.Admin.Controllers
         [Route("api/post/restore/{id}")]
         public async Task<IActionResult> Restore(int id)
         {
-            var success = await _postService.RestorePostAsync(id);
-            if (!success) return NotFound();
-            return Ok(new { success = true });
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var isAdmin = User.IsInRole("Admin");
+
+                var success = await _postService.RestorePostAsync(id, userId, isAdmin);
+                if (!success) return NotFound();
+                return Ok(new { success = true });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new { message = ex.Message });
+            }
         }
 
         [HttpPost]
@@ -136,12 +183,19 @@ namespace TechNews.Web.Areas.Admin.Controllers
         {
             try
             {
-                await _postService.PermanentDeletePostAsync(id);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var isAdmin = User.IsInRole("Admin");
+
+                await _postService.PermanentDeletePostAsync(id, userId, isAdmin);
                 return Ok(new { success = true });
             }
             catch (KeyNotFoundException)
             {
                 return NotFound();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new { message = ex.Message });
             }
         }
 

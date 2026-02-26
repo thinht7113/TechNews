@@ -6,7 +6,10 @@
     var currentUser = await UserManager.GetUserAsync(User);
     var fullName = currentUser?.FullName ?? User.Identity?.Name ?? "Admin";
     var avatarUrl = currentUser?.Avatar ?? $"https://ui-avatars.com/api/?name={fullName}&background=9f224e&color=fff";
-    var role = "Quản trị viên"; // Simplified for now, or fetch roles
+    
+    var roles = currentUser != null ? await UserManager.GetRolesAsync(currentUser) : new List<string>();
+    var isAdmin = roles.Contains("Admin");
+    var roleDisplay = isAdmin ? "Quản trị viên" : (roles.Contains("Editor") ? "Biên tập viên" : "Người dùng");
 }
 
 <!DOCTYPE html>
@@ -111,19 +114,22 @@
                                 </router-link>
                             </li>
 
-                             <!-- Categories -->
-                            <li>
-                                <router-link to="/Admin/Category" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                   <i class="bi bi-folder text-lg"></i> Danh mục
-                                </router-link>
-                            </li>
+                            @if (isAdmin)
+                            {
+                                 <!-- Categories -->
+                                <li>
+                                    <router-link to="/Admin/Category" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                       <i class="bi bi-folder text-lg"></i> Danh mục
+                                    </router-link>
+                                </li>
 
-                            <!-- Tags -->
-                            <li>
-                                <router-link to="/Admin/Tag" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                   <i class="bi bi-tags text-lg"></i> Thẻ (Tags)
-                                </router-link>
-                            </li>
+                                <!-- Tags -->
+                                <li>
+                                    <router-link to="/Admin/Tag" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                       <i class="bi bi-tags text-lg"></i> Thẻ (Tags)
+                                    </router-link>
+                                </li>
+                            }
                             
                             <!-- Media -->
                             <li>
@@ -132,37 +138,36 @@
                                 </router-link>
                             </li>
 
-                            <!-- Users -->
-                            <li>
-                                <router-link to="/Admin/User" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                   <i class="bi bi-people text-lg"></i> Người dùng
-                                </router-link>
-                            </li>
+                            @if (isAdmin)
+                            {
+                                <!-- Users -->
+                                <li>
+                                    <router-link to="/Admin/User" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                       <i class="bi bi-people text-lg"></i> Người dùng
+                                    </router-link>
+                                </li>
 
-                            <!-- Comments -->
-                            <li>
-                                <router-link to="/Admin/Comment" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                   <i class="bi bi-chat-dots text-lg"></i> Bình luận
-                                </router-link>
-                            </li>
+                                <!-- Comments -->
+                                <li>
+                                    <router-link to="/Admin/Comment" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                       <i class="bi bi-chat-dots text-lg"></i> Bình luận
+                                    </router-link>
+                                </li>
 
+                                <!-- Menus -->
+                                <li>
+                                    <router-link to="/Admin/Menu" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                       <i class="bi bi-list-nested text-lg"></i> Menu
+                                    </router-link>
+                                </li>
 
-
-
-
-                            <!-- Menus -->
-                            <li>
-                                <router-link to="/Admin/Menu" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                   <i class="bi bi-list-nested text-lg"></i> Menu
-                                </router-link>
-                            </li>
-
-                            <!-- Newsletter -->
-                            <li>
-                                <router-link to="/Admin/Newsletter" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                   <i class="bi bi-envelope-paper text-lg"></i> Newsletter
-                                </router-link>
-                            </li>
+                                <!-- Newsletter -->
+                                <li>
+                                    <router-link to="/Admin/Newsletter" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                       <i class="bi bi-envelope-paper text-lg"></i> Newsletter
+                                    </router-link>
+                                </li>
+                            }
 
                         </ul>
 
@@ -192,16 +197,20 @@
                                    <i class="bi bi-box-arrow-up-right text-lg"></i> Xem trang chủ
                                 </a>
                             </li>
-                            <li>
-                                <router-link to="/Admin/Settings" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                   <i class="bi bi-gear text-lg"></i> Cấu hình
-                                </router-link>
-                            </li>
-                            <li>
-                                <router-link to="/Admin/System" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                   <i class="bi bi-hdd-rack text-lg"></i> Bảo trì & Logs
-                                </router-link>
-                            </li>
+
+                            @if (isAdmin)
+                            {
+                                <li>
+                                    <router-link to="/Admin/Settings" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                       <i class="bi bi-gear text-lg"></i> Cấu hình
+                                    </router-link>
+                                </li>
+                                <li>
+                                    <router-link to="/Admin/System" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
+                                       <i class="bi bi-hdd-rack text-lg"></i> Bảo trì & Logs
+                                    </router-link>
+                                </li>
+                            }
                          </ul>
                     </div>
                 </nav>
@@ -218,7 +227,7 @@
                 <div class="flex items-center gap-4">
                     <div class="text-right hidden sm:block">
                         <span class="block text-sm font-medium text-black">@fullName</span>
-                        <span class="block text-xs font-medium text-slate-500">@role</span>
+                        <span class="block text-xs font-medium text-slate-500">@roleDisplay</span>
                     </div>
                     <div class="relative group">
                         <img src="@avatarUrl" class="h-10 w-10 rounded-full cursor-pointer object-cover border border-stroke" />

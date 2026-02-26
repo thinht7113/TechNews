@@ -7,7 +7,7 @@ using TechNews.Infrastructure.Data;
 namespace TechNews.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Editor")]
     [Route("api/[controller]")]
     [ApiController]
     public class TagController : Controller
@@ -39,6 +39,7 @@ namespace TechNews.Web.Areas.Admin.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] Tag model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -52,6 +53,7 @@ namespace TechNews.Web.Areas.Admin.Controllers
         }
 
         [HttpPost("update/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] Tag model)
         {
             var tag = await _context.Tags.FindAsync(id);
@@ -65,6 +67,7 @@ namespace TechNews.Web.Areas.Admin.Controllers
         }
 
         [HttpPost("delete/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var tag = await _context.Tags.FindAsync(id);
