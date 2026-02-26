@@ -23,8 +23,16 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<TechNewsDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-builder.Services.AddIdentity<User, Role>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddEntityFrameworkStores<TechNewsDbContext>();
+builder.Services.AddIdentity<User, Role>(options => {
+    options.SignIn.RequireConfirmedAccount = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+})
+    .AddEntityFrameworkStores<TechNewsDbContext>()
+    .AddErrorDescriber<TechNews.Web.Extensions.CustomIdentityErrorDescriber>();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
