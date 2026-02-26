@@ -79,6 +79,7 @@ export default {
                         <label class="mb-2 block text-sm font-medium text-black">Vai trò</label>
                         <select v-model="form.role" class="w-full rounded border border-stroke px-4 py-2 focus:border-primary outline-none">
                             <option value="User">User</option>
+                            <option value="Editor">Editor</option>
                             <option value="Admin">Admin</option>
                         </select>
                     </div>
