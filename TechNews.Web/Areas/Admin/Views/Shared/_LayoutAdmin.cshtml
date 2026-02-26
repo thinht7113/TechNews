@@ -231,12 +231,14 @@
                     </div>
                     <div class="relative group">
                         <img src="@avatarUrl" class="h-10 w-10 rounded-full cursor-pointer object-cover border border-stroke" />
-                        <!-- Dropdown -->
-                        <div class="absolute right-0 mt-2 w-48 bg-white border border-stroke rounded shadow-lg hidden group-hover:block">
-                            <form action="/Identity/Account/Logout" method="post">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-100">Đăng xuất</button>
-                            </form>
+                        <!-- Dropdown wrapper with padding to maintain hover state -->
+                        <div class="absolute right-0 pt-2 hidden group-hover:block">
+                            <div class="w-48 bg-white border border-stroke rounded shadow-lg">
+                                <form action="/Identity/Account/Logout" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-100">Đăng xuất</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
