@@ -126,7 +126,7 @@
                 @if (User.Identity!.IsAuthenticated)
                 {
                     <div class="hidden md:flex items-center gap-3 pl-4 border-l border-slate-200">
-                        @if (User.IsInRole("Admin"))
+                        @if (User.IsInRole("Admin") || User.IsInRole("Editor"))
                         {
                             <a href="/Admin" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-[#9f224e] hover:text-white transition-colors text-sm font-medium" title="Vào trang quản trị">
                                 <i class="bi bi-grid-fill"></i> <span class="hidden lg:inline">Quản trị</span>
@@ -174,7 +174,7 @@
                             <div class="flex items-center justify-between">
                                 <span class="text-slate-500">Xin chào, @User.Identity.Name</span>
                                 <div class="flex gap-2">
-                                     @if (User.IsInRole("Admin"))
+                                     @if (User.IsInRole("Admin") || User.IsInRole("Editor"))
                                      {
                                          <a href="/Admin" class="text-[#9f224e] font-bold">Trang quản trị</a>
                                      }
