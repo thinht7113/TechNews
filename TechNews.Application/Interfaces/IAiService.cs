@@ -7,6 +7,6 @@ namespace TechNews.Application.Interfaces
         Task<List<string>> SuggestTagsAsync(string content);
         Task<string> ImproveWritingAsync(string content);
         Task<List<string>> GenerateTitlesAsync(string content);
-        bool IsConfigured { get; }
+        Task<bool> IsConfiguredAsync();
     }
 }

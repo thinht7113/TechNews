@@ -107,11 +107,12 @@ namespace TechNews.Application.Services
                 {
                     p.Id,
                     p.Title,
+                    p.ShortDescription,
                     p.Slug,
-                    Status = p.Status.ToString(),
-                    Category = p.Category?.Name,
-                    Author = p.Author?.FullName ?? p.Author?.Email,
-                    SubmittedDate = p.ModifiedDate?.ToString("dd/MM/yyyy HH:mm"),
+                    Status = (int)p.Status, // Bug 4 fix: numeric for frontend statusLabels
+                    CategoryName = p.Category?.Name,
+                    AuthorName = p.Author?.FullName ?? p.Author?.Email,
+                    p.CreatedDate,
                     p.ReviewNote
                 });
         }
@@ -124,11 +125,11 @@ namespace TechNews.Application.Services
                 .Select(l => new
                 {
                     l.Id,
-                    FromStatus = l.FromStatus.ToString(),
-                    ToStatus = l.ToStatus.ToString(),
+                    FromStatus = (int)l.FromStatus, // Bug 5 fix: numeric for frontend
+                    ToStatus = (int)l.ToStatus,
                     User = l.User?.FullName ?? l.User?.Email ?? l.UserId,
                     l.Comment,
-                    Date = l.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                    l.CreatedDate // Bug 5 fix: use CreatedDate not Date
                 });
         }
 

@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using TechNews.Application.Interfaces;
 using TechNews.Domain.Entities;
 using TechNews.Domain.Interfaces;
@@ -11,6 +12,9 @@ namespace TechNews.Application.Services
     {
         private readonly HttpClient _httpClient;
         private readonly IRepository<SystemSetting> _settingRepo;
+
+        // Bug 2 fix: Thread-safe caching with SemaphoreSlim
+        private readonly SemaphoreSlim _cacheLock = new(1, 1);
         private string? _cachedApiKey;
         private string? _cachedProvider;
         private string? _cachedModel;
@@ -22,13 +26,11 @@ namespace TechNews.Application.Services
             _settingRepo = settingRepo;
         }
 
-        public bool IsConfigured
+        // Bug 1 fix: Changed from sync property to async method — no more .GetAwaiter().GetResult() deadlock
+        public async Task<bool> IsConfiguredAsync()
         {
-            get
-            {
-                RefreshSettingsIfNeeded().GetAwaiter().GetResult();
-                return !string.IsNullOrEmpty(_cachedApiKey);
-            }
+            await RefreshSettingsIfNeeded();
+            return !string.IsNullOrEmpty(_cachedApiKey);
         }
 
         public async Task<string> GenerateContentAsync(string prompt, string? context = null)
@@ -50,25 +52,7 @@ namespace TechNews.Application.Services
         {
             var prompt = $"Phân tích nội dung sau và đề xuất 5-8 tags phù hợp. Trả về dạng JSON array, ví dụ: [\"tag1\", \"tag2\"]. Chỉ trả về JSON, không thêm text khác.\n\n{content}";
             var response = await CallAiAsync("Bạn là trợ lý phân tích nội dung.", prompt);
-
-            try
-            {
-                // Try to parse JSON array from response
-                var cleaned = response.Trim();
-                if (cleaned.StartsWith("["))
-                {
-                    return JsonSerializer.Deserialize<List<string>>(cleaned) ?? new List<string>();
-                }
-                // If not JSON, split by comma
-                return cleaned.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(t => t.Trim().Trim('"', '\''))
-                    .Where(t => !string.IsNullOrEmpty(t))
-                    .ToList();
-            }
-            catch
-            {
-                return new List<string> { response };
-            }
+            return ParseJsonList(response);
         }
 
         public async Task<string> ImproveWritingAsync(string content)
@@ -81,16 +65,27 @@ namespace TechNews.Application.Services
         {
             var prompt = $"Đề xuất 5 tiêu đề hấp dẫn, SEO-friendly cho nội dung sau. Trả về dạng JSON array. Chỉ trả về JSON.\n\n{content}";
             var response = await CallAiAsync("Bạn là chuyên gia content marketing.", prompt);
+            return ParseJsonList(response);
+        }
 
+        // Bug 8 fix: Robust JSON parsing — strips markdown code fences before attempting parse
+        private static List<string> ParseJsonList(string response)
+        {
             try
             {
                 var cleaned = response.Trim();
+                // Strip markdown code fences: ```json ... ``` or ``` ... ```
+                cleaned = Regex.Replace(cleaned, @"^```\w*\s*", "", RegexOptions.Multiline);
+                cleaned = Regex.Replace(cleaned, @"```\s*$", "", RegexOptions.Multiline);
+                cleaned = cleaned.Trim();
+
                 if (cleaned.StartsWith("["))
                 {
                     return JsonSerializer.Deserialize<List<string>>(cleaned) ?? new List<string>();
                 }
-                return cleaned.Split('\n', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(t => t.Trim().TrimStart('-', '1', '2', '3', '4', '5', '.', ' '))
+                // Fallback: split by newlines or commas
+                return cleaned.Split(new[] { '\n', ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(t => t.Trim().TrimStart('-', '1', '2', '3', '4', '5', '6', '7', '8', '.', ' ').Trim('"', '\''))
                     .Where(t => !string.IsNullOrEmpty(t))
                     .ToList();
             }
@@ -189,17 +184,29 @@ namespace TechNews.Application.Services
                 .GetString() ?? string.Empty;
         }
 
+        // Bug 2 fix: Thread-safe settings refresh with SemaphoreSlim
         private async Task RefreshSettingsIfNeeded()
         {
             if (DateTime.Now < _cacheExpiry) return;
 
-            var settings = await _settingRepo.GetAllAsync();
-            var settingList = settings.ToList();
+            await _cacheLock.WaitAsync();
+            try
+            {
+                // Double-check after acquiring lock
+                if (DateTime.Now < _cacheExpiry) return;
 
-            _cachedApiKey = settingList.FirstOrDefault(s => s.Key == "AiApiKey")?.Value;
-            _cachedProvider = settingList.FirstOrDefault(s => s.Key == "AiProvider")?.Value ?? "openai";
-            _cachedModel = settingList.FirstOrDefault(s => s.Key == "AiModel")?.Value;
-            _cacheExpiry = DateTime.Now.AddMinutes(5); // Cache for 5 minutes
+                var settings = await _settingRepo.GetAllAsync();
+                var settingList = settings.ToList();
+
+                _cachedApiKey = settingList.FirstOrDefault(s => s.Key == "AiApiKey")?.Value;
+                _cachedProvider = settingList.FirstOrDefault(s => s.Key == "AiProvider")?.Value ?? "openai";
+                _cachedModel = settingList.FirstOrDefault(s => s.Key == "AiModel")?.Value;
+                _cacheExpiry = DateTime.Now.AddMinutes(5);
+            }
+            finally
+            {
+                _cacheLock.Release();
+            }
         }
     }
 }

@@ -17,9 +17,10 @@ namespace TechNews.Web.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("api/ai/status")]
-        public IActionResult Status()
+        public async Task<IActionResult> Status()
         {
-            return Ok(new { configured = _aiService.IsConfigured });
+            var configured = await _aiService.IsConfiguredAsync();
+            return Ok(new { configured });
         }
 
         [HttpPost]

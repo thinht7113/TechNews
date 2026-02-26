@@ -11,10 +11,12 @@ namespace TechNews.Web.Areas.Admin.Controllers
     public class CalendarController : Controller
     {
         private readonly IRepository<Post> _postRepo;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CalendarController(IRepository<Post> postRepo)
+        public CalendarController(IRepository<Post> postRepo, IUnitOfWork unitOfWork)
         {
             _postRepo = postRepo;
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult Index() => View("Spa");
@@ -29,14 +31,25 @@ namespace TechNews.Web.Areas.Admin.Controllers
             var from = start ?? DateTime.Now.AddMonths(-1);
             var to = end ?? DateTime.Now.AddMonths(2);
 
-            var posts = await _postRepo.GetAllAsync(p => p.Category, p => p.Author);
-            var events = posts
-                .Where(p => !p.IsDeleted && (
+            // Bug 6 fix: filter at DB level instead of loading all posts
+            var posts = await _postRepo.FindAsync(
+                p => !p.IsDeleted && (
                     p.Status == PostStatus.Published ||
                     p.Status == PostStatus.Scheduled ||
                     p.Status == PostStatus.InReview ||
                     p.Status == PostStatus.Draft
-                ))
+                ),
+                p => p.Category, p => p.Author
+            );
+
+            var events = posts
+                .Where(p =>
+                {
+                    var eventDate = p.Status == PostStatus.Scheduled && p.ScheduledPublishDate.HasValue
+                        ? p.ScheduledPublishDate.Value
+                        : p.CreatedDate;
+                    return eventDate >= from && eventDate <= to;
+                })
                 .Select(p => new
                 {
                     id = p.Id,
@@ -72,6 +85,7 @@ namespace TechNews.Web.Areas.Admin.Controllers
             post.ScheduledPublishDate = dto.PublishDate;
             post.ModifiedDate = DateTime.Now;
             await _postRepo.UpdateAsync(post);
+            await _unitOfWork.CompleteAsync(); // Bug 3 fix: commit changes to database
 
             return Ok(new { success = true, message = $"Đã lên lịch xuất bản lúc {dto.PublishDate:dd/MM/yyyy HH:mm}." });
         }
