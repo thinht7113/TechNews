@@ -1,4 +1,4 @@
-@model TechNews.Domain.Entities.Comment
+﻿@model TechNews.Domain.Entities.Comment
 
 <div class="flex gap-4 p-4 mb-4 bg-gray-50 rounded-xl animate-fade-in-up">
     <div class="flex-shrink-0">
@@ -8,7 +8,7 @@
     </div>
     <div class="flex-grow">
         <div class="flex items-center justify-between mb-1">
-            <h5 class="font-bold text-gray-900 text-sm">@(Model.User?.FullName ?? "Người dùng")</h5>
+            <h5 class="font-bold text-gray-900 text-sm">@(Model.User?.FullName ?? "NgÆ°á»i dÃ¹ng")</h5>
             <span class="text-xs text-gray-500">@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
         </div>
         <p class="text-gray-700 text-sm leading-relaxed">
@@ -16,3 +16,4 @@
         </p>
     </div>
 </div>
+

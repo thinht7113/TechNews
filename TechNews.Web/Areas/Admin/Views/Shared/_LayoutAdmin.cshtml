@@ -1,4 +1,4 @@
-@using Microsoft.AspNetCore.Identity
+﻿@using Microsoft.AspNetCore.Identity
 @using TechNews.Domain.Entities
 @inject UserManager<User> UserManager
 
@@ -9,7 +9,7 @@
     
     var roles = currentUser != null ? await UserManager.GetRolesAsync(currentUser) : new List<string>();
     var isAdmin = roles.Contains("Admin");
-    var roleDisplay = isAdmin ? "Quản trị viên" : (roles.Contains("Editor") ? "Biên tập viên" : "Người dùng");
+    var roleDisplay = isAdmin ? "Quáº£n trá»‹ viÃªn" : (roles.Contains("Editor") ? "BiÃªn táº­p viÃªn" : "NgÆ°á»i dÃ¹ng");
 }
 
 <!DOCTYPE html>
@@ -17,7 +17,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Quản trị</title>
+    <title>@ViewData["Title"] - Quáº£n trá»‹</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -25,7 +25,7 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#9f224e', // VnExpress-like Red/Maroon
+                        primary: '#2563eb', // VnExpress-like Red/Maroon
                         secondary: '#80CAEE',
                         stroke: '#E2E8F0',
                         'meta-4': '#313D4A', 
@@ -51,7 +51,7 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Tạm thời load CKEditor global script để dùng trong Vue component cho dễ -->
+    <!-- Táº¡m thá»i load CKEditor global script Ä‘á»ƒ dÃ¹ng trong Vue component cho dá»… -->
     <script type="importmap">
         {
             "imports": {
@@ -67,7 +67,7 @@
         
         /* Active Link Style */
         .router-link-active { 
-            color: #9f224e !important; 
+            color: #2563eb !important; 
             background-color: #ffe4e6 !important; /* Lighter red bg for better contrast */
         }
         
@@ -95,7 +95,7 @@
             <div class="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
                 <nav class="mt-5 px-4 py-4 lg:mt-9 lg:px-6">
                     <div>
-                        <h3 class="mb-4 ml-4 text-sm font-medium text-slate-400">MENU CHÍNH</h3>
+                        <h3 class="mb-4 ml-4 text-sm font-medium text-slate-400">MENU CHÃNH</h3>
                         <ul class="mb-6 flex flex-col gap-1.5">
                             
                             <!-- Dashboard -->
@@ -103,14 +103,14 @@
                             <!-- Dashboard -->
                             <li>
                                 <router-link to="/Admin/Dashboard" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                   <i class="bi bi-speedometer2 text-lg"></i> Bảng điều khiển
+                                   <i class="bi bi-speedometer2 text-lg"></i> Báº£ng Ä‘iá»u khiá»ƒn
                                 </router-link>
                             </li>
 
                             <!-- Posts -->
                             <li>
                                 <router-link to="/Admin/Post" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                   <i class="bi bi-file-text text-lg"></i> Bài viết
+                                   <i class="bi bi-file-text text-lg"></i> BÃ i viáº¿t
                                 </router-link>
                             </li>
 
@@ -119,14 +119,14 @@
                                  <!-- Categories -->
                                 <li>
                                     <router-link to="/Admin/Category" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                       <i class="bi bi-folder text-lg"></i> Danh mục
+                                       <i class="bi bi-folder text-lg"></i> Danh má»¥c
                                     </router-link>
                                 </li>
 
                                 <!-- Tags -->
                                 <li>
                                     <router-link to="/Admin/Tag" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                       <i class="bi bi-tags text-lg"></i> Thẻ (Tags)
+                                       <i class="bi bi-tags text-lg"></i> Tháº» (Tags)
                                     </router-link>
                                 </li>
                             }
@@ -134,7 +134,7 @@
                             <!-- Media -->
                             <li>
                                 <router-link to="/Admin/Media" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                   <i class="bi bi-images text-lg"></i> Thư viện
+                                   <i class="bi bi-images text-lg"></i> ThÆ° viá»‡n
                                 </router-link>
                             </li>
 
@@ -143,14 +143,14 @@
                                 <!-- Users -->
                                 <li>
                                     <router-link to="/Admin/User" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                       <i class="bi bi-people text-lg"></i> Người dùng
+                                       <i class="bi bi-people text-lg"></i> NgÆ°á»i dÃ¹ng
                                     </router-link>
                                 </li>
 
                                 <!-- Comments -->
                                 <li>
                                     <router-link to="/Admin/Comment" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                       <i class="bi bi-chat-dots text-lg"></i> Bình luận
+                                       <i class="bi bi-chat-dots text-lg"></i> BÃ¬nh luáº­n
                                     </router-link>
                                 </li>
 
@@ -175,26 +175,26 @@
                         <ul class="mb-6 flex flex-col gap-1.5">
                             <li>
                                 <router-link to="/Admin/Workflow" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                   <i class="bi bi-check2-square text-lg"></i> Duyệt bài
+                                   <i class="bi bi-check2-square text-lg"></i> Duyá»‡t bÃ i
                                 </router-link>
                             </li>
                             <li>
                                 <router-link to="/Admin/Analytics" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                   <i class="bi bi-graph-up text-lg"></i> Thống kê
+                                   <i class="bi bi-graph-up text-lg"></i> Thá»‘ng kÃª
                                 </router-link>
                             </li>
                             <li>
                                 <router-link to="/Admin/Calendar" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                   <i class="bi bi-calendar3 text-lg"></i> Lịch nội dung
+                                   <i class="bi bi-calendar3 text-lg"></i> Lá»‹ch ná»™i dung
                                 </router-link>
                             </li>
                         </ul>
                         
-                        <h3 class="mb-4 ml-4 text-sm font-medium text-slate-400">HỆ THỐNG</h3>
+                        <h3 class="mb-4 ml-4 text-sm font-medium text-slate-400">Há»† THá»NG</h3>
                          <ul class="mb-6 flex flex-col gap-1.5">
                             <li>
-                                <a href="/" target="_blank" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-[#9f224e] duration-300 ease-in-out hover:bg-red-50">
-                                   <i class="bi bi-box-arrow-up-right text-lg"></i> Xem trang chủ
+                                <a href="/" target="_blank" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-[#2563eb] duration-300 ease-in-out hover:bg-red-50">
+                                   <i class="bi bi-box-arrow-up-right text-lg"></i> Xem trang chá»§
                                 </a>
                             </li>
 
@@ -202,12 +202,12 @@
                             {
                                 <li>
                                     <router-link to="/Admin/Settings" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                       <i class="bi bi-gear text-lg"></i> Cấu hình
+                                       <i class="bi bi-gear text-lg"></i> Cáº¥u hÃ¬nh
                                     </router-link>
                                 </li>
                                 <li>
                                     <router-link to="/Admin/System" class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-black duration-300 ease-in-out hover:bg-gray-100 hover:text-primary">
-                                       <i class="bi bi-hdd-rack text-lg"></i> Bảo trì & Logs
+                                       <i class="bi bi-hdd-rack text-lg"></i> Báº£o trÃ¬ & Logs
                                     </router-link>
                                 </li>
                             }
@@ -236,7 +236,7 @@
                             <div class="w-48 bg-white border border-stroke rounded shadow-lg">
                                 <form action="/Identity/Account/Logout" method="post">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-100">Đăng xuất</button>
+                                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-100">ÄÄƒng xuáº¥t</button>
                                 </form>
                             </div>
                         </div>
@@ -267,9 +267,9 @@
                 <text>
                 Swal.fire({
                     icon: 'success',
-                    title: 'Thành công!',
+                    title: 'ThÃ nh cÃ´ng!',
                     text: '@TempData["SuccessMessage"]',
-                    confirmButtonColor: '#9f224e'
+                    confirmButtonColor: '#2563eb'
                 });
                 </text>
             }
@@ -278,7 +278,7 @@
                 <text>
                 Swal.fire({
                     icon: 'error',
-                    title: 'Lỗi!',
+                    title: 'Lá»—i!',
                     text: '@TempData["ErrorMessage"]',
                     confirmButtonColor: '#d33'
                 });
@@ -289,14 +289,14 @@
         // Global Delete Confirmation
         function confirmDelete(url) {
             Swal.fire({
-                title: 'Bạn có chắc chắn?',
-                text: "Hành động này không thể hoàn tác!",
+                title: 'Báº¡n cÃ³ cháº¯c cháº¯n?',
+                text: "HÃ nh Ä‘á»™ng nÃ y khÃ´ng thá»ƒ hoÃ n tÃ¡c!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Xóa ngay',
-                cancelButtonText: 'Hủy'
+                confirmButtonText: 'XÃ³a ngay',
+                cancelButtonText: 'Há»§y'
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = url;
@@ -308,3 +308,4 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-const { ref, onMounted, onUnmounted } = Vue;
+﻿const { ref, onMounted, onUnmounted } = Vue;
 
 export default {
     setup() {
@@ -30,9 +30,9 @@ export default {
                 data: {
                     labels: overview.value.dailyViews.map(d => d.date),
                     datasets: [{
-                        label: 'Lượt xem',
+                        label: 'LÆ°á»£t xem',
                         data: overview.value.dailyViews.map(d => d.views),
-                        borderColor: '#9f224e',
+                        borderColor: '#2563eb',
                         backgroundColor: 'rgba(159, 34, 78, 0.1)',
                         fill: true,
                         tension: 0.4,
@@ -61,20 +61,20 @@ export default {
         <div>
             <div class="mb-6 flex items-center justify-between">
                 <div>
-                    <h2 class="text-2xl font-bold text-black">Thống kê nội dung</h2>
-                    <p class="text-sm text-slate-500 mt-1">Phân tích lượt xem và hành vi đọc giả</p>
+                    <h2 class="text-2xl font-bold text-black">Thá»‘ng kÃª ná»™i dung</h2>
+                    <p class="text-sm text-slate-500 mt-1">PhÃ¢n tÃ­ch lÆ°á»£t xem vÃ  hÃ nh vi Ä‘á»c giáº£</p>
                 </div>
                 <select v-model="days" @change="fetchOverview" class="border border-stroke rounded-lg px-4 py-2 text-sm bg-white">
-                    <option :value="7">7 ngày</option>
-                    <option :value="14">14 ngày</option>
-                    <option :value="30">30 ngày</option>
-                    <option :value="90">90 ngày</option>
+                    <option :value="7">7 ngÃ y</option>
+                    <option :value="14">14 ngÃ y</option>
+                    <option :value="30">30 ngÃ y</option>
+                    <option :value="90">90 ngÃ y</option>
                 </select>
             </div>
 
             <div v-if="isLoading" class="text-center py-10 text-slate-500">
                 <div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                Đang tải...
+                Äang táº£i...
             </div>
 
             <template v-else-if="overview">
@@ -83,7 +83,7 @@ export default {
                     <div class="bg-white rounded-lg border border-stroke p-5">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm text-slate-500">Tổng lượt xem</p>
+                                <p class="text-sm text-slate-500">Tá»•ng lÆ°á»£t xem</p>
                                 <h3 class="text-2xl font-bold text-black mt-1">{{ overview.totalViews?.toLocaleString() || 0 }}</h3>
                             </div>
                             <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
@@ -94,7 +94,7 @@ export default {
                     <div class="bg-white rounded-lg border border-stroke p-5">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm text-slate-500">Khách truy cập</p>
+                                <p class="text-sm text-slate-500">KhÃ¡ch truy cáº­p</p>
                                 <h3 class="text-2xl font-bold text-black mt-1">{{ overview.uniqueVisitors?.toLocaleString() || 0 }}</h3>
                             </div>
                             <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center">
@@ -105,7 +105,7 @@ export default {
                     <div class="bg-white rounded-lg border border-stroke p-5">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm text-slate-500">Thời gian đọc TB</p>
+                                <p class="text-sm text-slate-500">Thá»i gian Ä‘á»c TB</p>
                                 <h3 class="text-2xl font-bold text-black mt-1">{{ overview.avgTimeOnPage || 0 }}s</h3>
                             </div>
                             <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center">
@@ -116,7 +116,7 @@ export default {
                     <div class="bg-white rounded-lg border border-stroke p-5">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm text-slate-500">Tỉ lệ thoát</p>
+                                <p class="text-sm text-slate-500">Tá»‰ lá»‡ thoÃ¡t</p>
                                 <h3 class="text-2xl font-bold text-black mt-1">{{ overview.bounceRate || 0 }}%</h3>
                             </div>
                             <div class="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center">
@@ -128,7 +128,7 @@ export default {
 
                 <!-- Chart -->
                 <div class="bg-white rounded-lg border border-stroke p-5 mb-6">
-                    <h4 class="font-bold text-black mb-4">Lượt xem theo ngày</h4>
+                    <h4 class="font-bold text-black mb-4">LÆ°á»£t xem theo ngÃ y</h4>
                     <div style="height: 300px">
                         <canvas id="viewsChart"></canvas>
                     </div>
@@ -138,7 +138,7 @@ export default {
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Top Posts -->
                     <div class="bg-white rounded-lg border border-stroke p-5">
-                        <h4 class="font-bold text-black mb-4">Bài viết nổi bật</h4>
+                        <h4 class="font-bold text-black mb-4">BÃ i viáº¿t ná»•i báº­t</h4>
                         <div v-if="overview.topPosts && overview.topPosts.length > 0" class="space-y-3">
                             <div v-for="(post, i) in overview.topPosts" :key="post.postId"
                                 class="flex items-center justify-between text-sm border-b border-stroke pb-2 last:border-0">
@@ -153,29 +153,30 @@ export default {
                                 </div>
                             </div>
                         </div>
-                        <p v-else class="text-sm text-slate-500 text-center py-4">Chưa có dữ liệu</p>
+                        <p v-else class="text-sm text-slate-500 text-center py-4">ChÆ°a cÃ³ dá»¯ liá»‡u</p>
                     </div>
 
                     <!-- Top Referrers -->
                     <div class="bg-white rounded-lg border border-stroke p-5">
-                        <h4 class="font-bold text-black mb-4">Nguồn truy cập</h4>
+                        <h4 class="font-bold text-black mb-4">Nguá»“n truy cáº­p</h4>
                         <div v-if="overview.topReferrers && overview.topReferrers.length > 0" class="space-y-3">
                             <div v-for="ref in overview.topReferrers" :key="ref.source"
                                 class="flex items-center justify-between text-sm border-b border-stroke pb-2 last:border-0">
                                 <span class="text-black truncate max-w-[70%]">{{ ref.source }}</span>
-                                <span class="text-xs text-slate-500 font-medium">{{ ref.count }} lượt</span>
+                                <span class="text-xs text-slate-500 font-medium">{{ ref.count }} lÆ°á»£t</span>
                             </div>
                         </div>
-                        <p v-else class="text-sm text-slate-500 text-center py-4">Chưa có dữ liệu</p>
+                        <p v-else class="text-sm text-slate-500 text-center py-4">ChÆ°a cÃ³ dá»¯ liá»‡u</p>
                     </div>
                 </div>
             </template>
 
             <div v-else class="text-center py-20 bg-white rounded-lg border border-stroke">
                 <i class="bi bi-bar-chart text-5xl text-slate-300 mb-4 block"></i>
-                <p class="text-lg font-medium text-black">Chưa có dữ liệu thống kê</p>
-                <p class="text-sm text-slate-500 mt-1">Dữ liệu sẽ xuất hiện khi có lượt truy cập</p>
+                <p class="text-lg font-medium text-black">ChÆ°a cÃ³ dá»¯ liá»‡u thá»‘ng kÃª</p>
+                <p class="text-sm text-slate-500 mt-1">Dá»¯ liá»‡u sáº½ xuáº¥t hiá»‡n khi cÃ³ lÆ°á»£t truy cáº­p</p>
             </div>
         </div>
     `
 };
+

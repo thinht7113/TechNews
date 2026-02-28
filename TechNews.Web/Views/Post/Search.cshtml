@@ -1,12 +1,12 @@
-@model List<TechNews.Domain.Entities.Post>
+﻿@model List<TechNews.Domain.Entities.Post>
 @{
-    ViewData["Title"] = $"Tìm kiếm: {ViewBag.Query}";
+    ViewData["Title"] = $"TÃ¬m kiáº¿m: {ViewBag.Query}";
 }
 
 <div class="max-w-6xl mx-auto">
     <!-- Header -->
     <header class="mb-12 text-center">
-        <span class="text-gray-500 font-bold tracking-wider uppercase text-sm">Kết quả tìm kiếm</span>
+        <span class="text-gray-500 font-bold tracking-wider uppercase text-sm">Káº¿t quáº£ tÃ¬m kiáº¿m</span>
         <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mt-2 font-serif">"@ViewBag.Query"</h1>
         <div class="w-16 h-1 bg-gray-300 mx-auto mt-6 rounded-full"></div>
     </header>
@@ -61,9 +61,10 @@
     {
         <div class="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
             <div class="text-6xl text-gray-300 mb-4"><i class="bi bi-search"></i></div>
-            <h3 class="text-xl font-medium text-gray-600">Không tìm thấy bài viết nào cho từ khóa này.</h3>
-            <p class="text-gray-500 mt-2">Hãy thử tìm kiếm với từ khóa khác.</p>
-            <a href="/" class="inline-block mt-6 px-6 py-2 bg-primary text-white rounded-full hover:bg-blue-600 transition">Về trang chủ</a>
+            <h3 class="text-xl font-medium text-gray-600">KhÃ´ng tÃ¬m tháº¥y bÃ i viáº¿t nÃ o cho tá»« khÃ³a nÃ y.</h3>
+            <p class="text-gray-500 mt-2">HÃ£y thá»­ tÃ¬m kiáº¿m vá»›i tá»« khÃ³a khÃ¡c.</p>
+            <a href="/" class="inline-block mt-6 px-6 py-2 bg-primary text-white rounded-full hover:bg-blue-600 transition">Vá» trang chá»§</a>
         </div>
     }
 </div>
+

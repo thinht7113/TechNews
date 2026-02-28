@@ -1,20 +1,20 @@
-@using Microsoft.AspNetCore.Identity
+﻿@using Microsoft.AspNetCore.Identity
 @using TechNews.Domain.Entities
 @inject UserManager<User> UserManager
 @{
-    ViewData["Title"] = "Quản lý Người dùng";
+    ViewData["Title"] = "Quáº£n lÃ½ NgÆ°á»i dÃ¹ng";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
     var users = UserManager.Users.ToList();
 }
 
 <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <h2 class="text-title-md2 font-bold text-black dark:text-white">
-        Danh sách Người dùng
+        Danh sÃ¡ch NgÆ°á»i dÃ¹ng
     </h2>
     <nav>
         <ol class="flex items-center gap-2">
             <li><a class="font-medium" href="/Admin/Dashboard">Dashboard /</a></li>
-            <li class="font-medium text-primary">Người dùng</li>
+            <li class="font-medium text-primary">NgÆ°á»i dÃ¹ng</li>
         </ol>
     </nav>
 </div>
@@ -22,7 +22,7 @@
 <div class="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
     <div class="py-6 px-4 md:px-6 xl:px-7.5">
         <h4 class="text-xl font-semibold text-black dark:text-white">
-            Tất cả người dùng (@users.Count)
+            Táº¥t cáº£ ngÆ°á»i dÃ¹ng (@users.Count)
         </h4>
     </div>
 
@@ -79,3 +79,4 @@
         </table>
     </div>
 </div>
+

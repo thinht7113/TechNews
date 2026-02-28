@@ -98,7 +98,7 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Sinh nội dung',
                 cancelButtonText: 'Hủy',
-                confirmButtonColor: '#9f224e'
+                confirmButtonColor: '#2563eb'
             });
             if (!prompt.isConfirmed || !prompt.value) return;
             aiLoading.value = true;

@@ -1,4 +1,4 @@
-const { ref, reactive, onMounted, computed } = Vue;
+﻿const { ref, reactive, onMounted, computed } = Vue;
 const { useRoute, useRouter } = VueRouter;
 
 export default {
@@ -31,10 +31,10 @@ export default {
             });
 
             if (res.ok) {
-                Swal.fire('Thành công', isEdit.value ? 'Đã cập nhật!' : 'Đã tạo mới!', 'success');
+                Swal.fire('ThÃ nh cÃ´ng', isEdit.value ? 'ÄÃ£ cáº­p nháº­t!' : 'ÄÃ£ táº¡o má»›i!', 'success');
                 router.push('/Admin/Category');
             } else {
-                Swal.fire('Lỗi', 'Không thể lưu', 'error');
+                Swal.fire('Lá»—i', 'KhÃ´ng thá»ƒ lÆ°u', 'error');
             }
         };
 
@@ -46,30 +46,31 @@ export default {
                  <router-link to="/Admin/Category" class="text-black hover:text-primary">
                     <i class="bi bi-arrow-left text-2xl"></i>
                 </router-link>
-                <h2 class="text-2xl font-bold text-black">{{ isEdit ? 'Chỉnh sửa chuyên mục' : 'Thêm chuyên mục mới' }}</h2>
+                <h2 class="text-2xl font-bold text-black">{{ isEdit ? 'Chá»‰nh sá»­a chuyÃªn má»¥c' : 'ThÃªm chuyÃªn má»¥c má»›i' }}</h2>
             </div>
             
             <div class="rounded-sm border border-stroke bg-white shadow-default p-6">
                 <form @submit.prevent="submit" class="flex flex-col gap-4">
                     <div>
-                        <label class="mb-2 block text-sm font-medium text-black">Tên chuyên mục</label>
+                        <label class="mb-2 block text-sm font-medium text-black">TÃªn chuyÃªn má»¥c</label>
                         <input v-model="form.name" type="text" required class="w-full rounded border border-stroke px-4 py-2 focus:border-primary outline-none" />
                     </div>
                     <div>
-                        <label class="mb-2 block text-sm font-medium text-black">Slug (Đường dẫn)</label>
-                        <input v-model="form.slug" type="text" class="w-full rounded border border-stroke px-4 py-2 focus:border-primary outline-none" placeholder="tự-động-tạo-nếu-để-trống" />
+                        <label class="mb-2 block text-sm font-medium text-black">Slug (ÄÆ°á»ng dáº«n)</label>
+                        <input v-model="form.slug" type="text" class="w-full rounded border border-stroke px-4 py-2 focus:border-primary outline-none" placeholder="tá»±-Ä‘á»™ng-táº¡o-náº¿u-Ä‘á»ƒ-trá»‘ng" />
                     </div>
                     <div>
-                        <label class="mb-2 block text-sm font-medium text-black">Mô tả</label>
+                        <label class="mb-2 block text-sm font-medium text-black">MÃ´ táº£</label>
                         <textarea v-model="form.description" rows="3" class="w-full rounded border border-stroke px-4 py-2 focus:border-primary outline-none"></textarea>
                     </div>
                     
                     <div class="flex justify-end gap-3 mt-4">
-                        <router-link to="/Admin/Category" class="px-6 py-2 rounded border border-stroke hover:bg-gray-100">Hủy</router-link>
-                        <button type="submit" class="px-6 py-2 rounded bg-primary text-white hover:bg-opacity-90">Lưu lại</button>
+                        <router-link to="/Admin/Category" class="px-6 py-2 rounded border border-stroke hover:bg-gray-100">Há»§y</router-link>
+                        <button type="submit" class="px-6 py-2 rounded bg-primary text-white hover:bg-opacity-90">LÆ°u láº¡i</button>
                     </div>
                 </form>
             </div>
         </div>
     `
 };
+

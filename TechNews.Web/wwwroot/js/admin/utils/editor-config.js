@@ -1,4 +1,4 @@
-import {
+﻿import {
     ClassicEditor, Essentials, Paragraph, Bold, Italic, Font, SimpleUploadAdapter, Image, ImageUpload, ImageToolbar, ImageCaption, ImageStyle, ImageResize, Link, List, BlockQuote, Heading, MediaEmbed, HtmlEmbed, GeneralHtmlSupport, Alignment,
     Underline, Strikethrough, Subscript, Superscript, Code, CodeBlock, HorizontalLine, SourceEditing, RemoveFormat, SpecialCharacters, FindAndReplace, Highlight,
     Table, TableToolbar, TableProperties, TableCellProperties, Indent, IndentBlock
@@ -60,3 +60,4 @@ export const editorConfig = {
         ]
     }
 };
+

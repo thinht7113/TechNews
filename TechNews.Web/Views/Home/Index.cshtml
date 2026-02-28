@@ -19,11 +19,11 @@
                         <div class="relative overflow-hidden rounded-xl mb-4 aspect-video">
                             <img src="@Model.FeaturedMain.Thumbnail" alt="@Model.FeaturedMain.Title" 
                                  class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                            <span class="absolute bottom-4 left-4 bg-[#9f224e] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                            <span class="absolute bottom-4 left-4 bg-[#2563eb] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                                 @Model.FeaturedMain.Category?.Name
                             </span>
                         </div>
-                        <h1 class="text-3xl md:text-4xl font-extrabold leading-tight mb-3 group-hover:text-[#9f224e] transition-colors">
+                        <h1 class="text-3xl md:text-4xl font-extrabold leading-tight mb-3 group-hover:text-[#2563eb] transition-colors">
                             @Model.FeaturedMain.Title
                         </h1>
                         <p class="text-gray-600 text-lg line-clamp-3 leading-relaxed">
@@ -42,8 +42,8 @@
                              <img src="@item.Thumbnail" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
                          </a>
                          <div>
-                             <a href="/category/@item.Category?.Slug" class="text-xs font-bold text-[#9f224e] uppercase mb-1 block">@item.Category?.Name</a>
-                             <h3 class="font-bold text-lg leading-snug group-hover:text-[#9f224e] transition-colors line-clamp-3">
+                             <a href="/category/@item.Category?.Slug" class="text-xs font-bold text-[#2563eb] uppercase mb-1 block">@item.Category?.Name</a>
+                             <h3 class="font-bold text-lg leading-snug group-hover:text-[#2563eb] transition-colors line-clamp-3">
                                  <a href="/post/@item.Slug">@item.Title</a>
                              </h3>
                              <span class="text-xs text-gray-400 mt-1 block">@item.CreatedDate.ToString("dd/MM/yyyy")</span>
@@ -64,11 +64,11 @@
                 {
                     <section>
                         <!-- Section Header -->
-                        <div class="flex items-center justify-between mb-6 border-l-4 border-[#9f224e] pl-4">
+                        <div class="flex items-center justify-between mb-6 border-l-4 border-[#2563eb] pl-4">
                             <h2 class="text-2xl font-bold uppercase tracking-tight">
-                                <a href="/category/@catSection.CategorySlug" class="hover:text-[#9f224e]">@catSection.CategoryName</a>
+                                <a href="/category/@catSection.CategorySlug" class="hover:text-[#2563eb]">@catSection.CategoryName</a>
                             </h2>
-                            <a href="/category/@catSection.CategorySlug" class="text-sm font-semibold text-gray-500 hover:text-[#9f224e] flex items-center gap-1">
+                            <a href="/category/@catSection.CategorySlug" class="text-sm font-semibold text-gray-500 hover:text-[#2563eb] flex items-center gap-1">
                                 Xem tất cả <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
@@ -85,7 +85,7 @@
                                      </a>
                                      <div class="flex flex-col justify-center">
                                          <a href="/post/@first.Slug">
-                                             <h3 class="text-xl font-bold mb-3 leading-snug group-hover:text-[#9f224e] transition-colors">
+                                             <h3 class="text-xl font-bold mb-3 leading-snug group-hover:text-[#2563eb] transition-colors">
                                                  @first.Title
                                              </h3>
                                              <p class="text-gray-600 text-sm line-clamp-3 mb-3">@first.ShortDescription</p>
@@ -102,7 +102,7 @@
                                     <a href="/post/@post.Slug" class="block aspect-[3/2] overflow-hidden rounded-lg mb-3">
                                         <img src="@post.Thumbnail" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                     </a>
-                                    <h3 class="font-bold text-base leading-snug mb-2 group-hover:text-[#9f224e] transition-colors line-clamp-2">
+                                    <h3 class="font-bold text-base leading-snug mb-2 group-hover:text-[#2563eb] transition-colors line-clamp-2">
                                         <a href="/post/@post.Slug">@post.Title</a>
                                     </h3>
                                     <div class="flex items-center text-xs text-gray-400">
@@ -177,7 +177,7 @@
                 <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
                     <h3 class="font-bold text-xl mb-6 relative inline-block">
                         Đọc nhiều nhất
-                        <span class="absolute bottom-0 left-0 w-full h-1 bg-[#9f224e]/20"></span>
+                        <span class="absolute bottom-0 left-0 w-full h-1 bg-[#2563eb]/20"></span>
                     </h3>
                     
                     <div class="flex flex-col gap-6">
@@ -185,9 +185,9 @@
                         {
                             var post = Model.MostViewed[i];
                             <article class="flex gap-4 group items-center">
-                                <span class="text-3xl font-black text-gray-200 group-hover:text-[#9f224e] transition-colors">@(i+1)</span>
+                                <span class="text-3xl font-black text-gray-200 group-hover:text-[#2563eb] transition-colors">@(i+1)</span>
                                 <div>
-                                    <h4 class="font-bold text-sm leading-snug group-hover:text-[#9f224e] transition-colors line-clamp-2">
+                                    <h4 class="font-bold text-sm leading-snug group-hover:text-[#2563eb] transition-colors line-clamp-2">
                                         <a href="/post/@post.Slug">@post.Title</a>
                                     </h4>
                                     <span class="text-xs text-gray-400 mt-1 block">@post.ViewCount views</span>
@@ -203,7 +203,7 @@
                     <div class="flex flex-wrap gap-2">
                         @foreach (var tag in Model.TrendingTags)
                         {
-                            <a href="/post/search?query=@tag" class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded hover:bg-[#9f224e] hover:text-white transition-colors">
+                            <a href="/post/search?query=@tag" class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded hover:bg-[#2563eb] hover:text-white transition-colors">
                                 #@tag
                             </a>
                         }
@@ -217,4 +217,5 @@
         </div>
     </div>
 </div>
+
 

@@ -1,4 +1,4 @@
-const { ref, onMounted } = Vue;
+﻿const { ref, onMounted } = Vue;
 
 export default {
     setup() {
@@ -7,8 +7,8 @@ export default {
         const isLoading = ref(false);
 
         const statusLabels = {
-            'Draft': 'Nháp', 'Published': 'Đã phát hành', 'Scheduled': 'Đã lên lịch',
-            'InReview': 'Đang duyệt', 'Rejected': 'Từ chối', 'Archived': 'Lưu trữ'
+            'Draft': 'NhÃ¡p', 'Published': 'ÄÃ£ phÃ¡t hÃ nh', 'Scheduled': 'ÄÃ£ lÃªn lá»‹ch',
+            'InReview': 'Äang duyá»‡t', 'Rejected': 'Tá»« chá»‘i', 'Archived': 'LÆ°u trá»¯'
         };
 
         const daysInMonth = (date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -61,18 +61,18 @@ export default {
 
         const schedulePost = async () => {
             const { value: formValues } = await Swal.fire({
-                title: 'Lên lịch xuất bản',
+                title: 'LÃªn lá»‹ch xuáº¥t báº£n',
                 html: `
                     <input id="swal-postid" class="swal2-input" placeholder="Post ID" type="number" />
                     <input id="swal-date" class="swal2-input" type="datetime-local" />
                 `,
                 focusConfirm: false,
-                showCancelButton: true, confirmButtonText: 'Lên lịch', cancelButtonText: 'Hủy', confirmButtonColor: '#3b82f6',
+                showCancelButton: true, confirmButtonText: 'LÃªn lá»‹ch', cancelButtonText: 'Há»§y', confirmButtonColor: '#3b82f6',
                 preConfirm: () => {
                     const postId = document.getElementById('swal-postid').value;
                     const publishDate = document.getElementById('swal-date').value;
-                    if (!postId || !publishDate) { Swal.showValidationMessage('Nhập đầy đủ!'); return false; }
-                    if (new Date(publishDate) <= new Date()) { Swal.showValidationMessage('Phải trong tương lai!'); return false; }
+                    if (!postId || !publishDate) { Swal.showValidationMessage('Nháº­p Ä‘áº§y Ä‘á»§!'); return false; }
+                    if (new Date(publishDate) <= new Date()) { Swal.showValidationMessage('Pháº£i trong tÆ°Æ¡ng lai!'); return false; }
                     return { postId: parseInt(postId), publishDate };
                 }
             });
@@ -84,8 +84,8 @@ export default {
                 });
                 const data = await res.json();
                 if (res.ok) { Swal.fire({ icon: 'success', title: data.message, timer: 2000, showConfirmButton: false }); fetchEvents(); }
-                else Swal.fire('Lỗi', data.message, 'error');
-            } catch (e) { Swal.fire('Lỗi', 'Kết nối server thất bại', 'error'); }
+                else Swal.fire('Lá»—i', data.message, 'error');
+            } catch (e) { Swal.fire('Lá»—i', 'Káº¿t ná»‘i server tháº¥t báº¡i', 'error'); }
         };
 
         onMounted(fetchEvents);
@@ -96,12 +96,12 @@ export default {
         <div>
             <div class="mb-6 flex items-center justify-between">
                 <div>
-                    <h2 class="text-2xl font-bold text-black">Lịch nội dung</h2>
-                    <p class="text-sm text-slate-500 mt-1">Lên lịch và quản lý bài viết</p>
+                    <h2 class="text-2xl font-bold text-black">Lá»‹ch ná»™i dung</h2>
+                    <p class="text-sm text-slate-500 mt-1">LÃªn lá»‹ch vÃ  quáº£n lÃ½ bÃ i viáº¿t</p>
                 </div>
                 <button @click="schedulePost"
                     class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-opacity-90 transition">
-                    <i class="bi bi-plus-lg"></i> Lên lịch mới
+                    <i class="bi bi-plus-lg"></i> LÃªn lá»‹ch má»›i
                 </button>
             </div>
 
@@ -144,15 +144,16 @@ export default {
 
             <!-- Events Legend -->
             <div class="bg-white rounded-lg border border-stroke p-4">
-                <h4 class="font-bold text-black mb-3">Chú thích</h4>
+                <h4 class="font-bold text-black mb-3">ChÃº thÃ­ch</h4>
                 <div class="flex flex-wrap gap-4 text-xs">
-                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#10b981]"></span> Đã phát hành</div>
-                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#3b82f6]"></span> Đã lên lịch</div>
-                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#f59e0b]"></span> Đang duyệt</div>
-                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#6b7280]"></span> Nháp</div>
-                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#ef4444]"></span> Từ chối</div>
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#10b981]"></span> ÄÃ£ phÃ¡t hÃ nh</div>
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#3b82f6]"></span> ÄÃ£ lÃªn lá»‹ch</div>
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#f59e0b]"></span> Äang duyá»‡t</div>
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#6b7280]"></span> NhÃ¡p</div>
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#ef4444]"></span> Tá»« chá»‘i</div>
                 </div>
             </div>
         </div>
     `
 };
+

@@ -1,8 +1,8 @@
-@model Dictionary<string, string>
+﻿@model Dictionary<string, string>
 @{
     string Get(string key, string fallback = "") => Model.ContainsKey(key) && !string.IsNullOrEmpty(Model[key]) ? Model[key] : fallback;
     var siteTitle = Get("SiteTitle", "TechNews");
-    var siteDesc = Get("SiteDescription", "Cập nhật tin tức công nghệ nóng hổi, đánh giá sản phẩm chuyên sâu và hướng dẫn thủ thuật hữu ích mỗi ngày.");
+    var siteDesc = Get("SiteDescription", "Cáº­p nháº­t tin tá»©c cÃ´ng nghá»‡ nÃ³ng há»•i, Ä‘Ã¡nh giÃ¡ sáº£n pháº©m chuyÃªn sÃ¢u vÃ  hÆ°á»›ng dáº«n thá»§ thuáº­t há»¯u Ã­ch má»—i ngÃ y.");
     var contactEmail = Get("ContactEmail", "contact@technews.com");
     var contactPhone = Get("ContactPhone", "");
     var facebookUrl = Get("FacebookUrl", "#");
@@ -31,3 +31,4 @@
     window.__siteTitle = '@Html.Raw(siteTitle.Replace("'", "\\'"))';
     window.__contactEmail = '@contactEmail';
 </script>
+

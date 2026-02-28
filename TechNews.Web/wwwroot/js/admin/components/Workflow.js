@@ -1,4 +1,4 @@
-const { ref, onMounted } = Vue;
+﻿const { ref, onMounted } = Vue;
 
 export default {
     setup() {
@@ -8,8 +8,8 @@ export default {
         const isLoading = ref(false);
 
         const statusLabels = {
-            0: 'Nháp', 1: 'Đã phát hành', 2: 'Lưu trữ', 3: 'Ẩn',
-            4: 'Chờ duyệt', 5: 'Đang duyệt', 6: 'Từ chối', 7: 'Đã lên lịch'
+            0: 'NhÃ¡p', 1: 'ÄÃ£ phÃ¡t hÃ nh', 2: 'LÆ°u trá»¯', 3: 'áº¨n',
+            4: 'Chá» duyá»‡t', 5: 'Äang duyá»‡t', 6: 'Tá»« chá»‘i', 7: 'ÄÃ£ lÃªn lá»‹ch'
         };
         const statusColors = {
             0: 'bg-gray-100 text-gray-600', 1: 'bg-green-100 text-green-700', 2: 'bg-slate-100 text-slate-700',
@@ -36,9 +36,9 @@ export default {
 
         const approve = async (postId) => {
             const result = await Swal.fire({
-                title: 'Duyệt bài viết?', text: 'Bài sẽ được phát hành ngay sau khi duyệt.',
-                icon: 'question', showCancelButton: true, confirmButtonText: 'Duyệt', cancelButtonText: 'Hủy', confirmButtonColor: '#10b981',
-                input: 'text', inputPlaceholder: 'Ghi chú (tùy chọn)', inputAttributes: { autocapitalize: 'off' }
+                title: 'Duyá»‡t bÃ i viáº¿t?', text: 'BÃ i sáº½ Ä‘Æ°á»£c phÃ¡t hÃ nh ngay sau khi duyá»‡t.',
+                icon: 'question', showCancelButton: true, confirmButtonText: 'Duyá»‡t', cancelButtonText: 'Há»§y', confirmButtonColor: '#10b981',
+                input: 'text', inputPlaceholder: 'Ghi chÃº (tÃ¹y chá»n)', inputAttributes: { autocapitalize: 'off' }
             });
             if (!result.isConfirmed) return;
             try {
@@ -46,17 +46,17 @@ export default {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ comment: result.value || '' })
                 });
-                if (res.ok) { Swal.fire({ icon: 'success', title: 'Đã duyệt!', timer: 1500, showConfirmButton: false }); fetchPending(); }
-                else { const d = await res.json(); Swal.fire('Lỗi', d.message || 'Không thể duyệt', 'error'); }
-            } catch (e) { Swal.fire('Lỗi', 'Không thể kết nối server', 'error'); }
+                if (res.ok) { Swal.fire({ icon: 'success', title: 'ÄÃ£ duyá»‡t!', timer: 1500, showConfirmButton: false }); fetchPending(); }
+                else { const d = await res.json(); Swal.fire('Lá»—i', d.message || 'KhÃ´ng thá»ƒ duyá»‡t', 'error'); }
+            } catch (e) { Swal.fire('Lá»—i', 'KhÃ´ng thá»ƒ káº¿t ná»‘i server', 'error'); }
         };
 
         const reject = async (postId) => {
             const result = await Swal.fire({
-                title: 'Từ chối bài viết?', icon: 'warning', showCancelButton: true,
-                confirmButtonText: 'Từ chối', cancelButtonText: 'Hủy', confirmButtonColor: '#ef4444',
-                input: 'textarea', inputPlaceholder: 'Lý do từ chối (bắt buộc)...',
-                inputValidator: (value) => { if (!value) return 'Vui lòng nhập lý do từ chối!'; }
+                title: 'Tá»« chá»‘i bÃ i viáº¿t?', icon: 'warning', showCancelButton: true,
+                confirmButtonText: 'Tá»« chá»‘i', cancelButtonText: 'Há»§y', confirmButtonColor: '#ef4444',
+                input: 'textarea', inputPlaceholder: 'LÃ½ do tá»« chá»‘i (báº¯t buá»™c)...',
+                inputValidator: (value) => { if (!value) return 'Vui lÃ²ng nháº­p lÃ½ do tá»« chá»‘i!'; }
             });
             if (!result.isConfirmed) return;
             try {
@@ -64,20 +64,20 @@ export default {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ comment: result.value })
                 });
-                if (res.ok) { Swal.fire({ icon: 'success', title: 'Đã từ chối!', timer: 1500, showConfirmButton: false }); fetchPending(); }
-                else { const d = await res.json(); Swal.fire('Lỗi', d.message || 'Lỗi', 'error'); }
-            } catch (e) { Swal.fire('Lỗi', 'Không thể kết nối server', 'error'); }
+                if (res.ok) { Swal.fire({ icon: 'success', title: 'ÄÃ£ tá»« chá»‘i!', timer: 1500, showConfirmButton: false }); fetchPending(); }
+                else { const d = await res.json(); Swal.fire('Lá»—i', d.message || 'Lá»—i', 'error'); }
+            } catch (e) { Swal.fire('Lá»—i', 'KhÃ´ng thá»ƒ káº¿t ná»‘i server', 'error'); }
         };
 
         const schedule = async (postId) => {
             const result = await Swal.fire({
-                title: 'Lên lịch xuất bản', icon: 'info', showCancelButton: true,
-                confirmButtonText: 'Lên lịch', cancelButtonText: 'Hủy', confirmButtonColor: '#3b82f6',
+                title: 'LÃªn lá»‹ch xuáº¥t báº£n', icon: 'info', showCancelButton: true,
+                confirmButtonText: 'LÃªn lá»‹ch', cancelButtonText: 'Há»§y', confirmButtonColor: '#3b82f6',
                 html: '<input id="schedule-date" type="datetime-local" class="swal2-input" />',
                 preConfirm: () => {
                     const date = document.getElementById('schedule-date').value;
-                    if (!date) { Swal.showValidationMessage('Chọn ngày giờ!'); return false; }
-                    if (new Date(date) <= new Date()) { Swal.showValidationMessage('Phải chọn thời điểm trong tương lai!'); return false; }
+                    if (!date) { Swal.showValidationMessage('Chá»n ngÃ y giá»!'); return false; }
+                    if (new Date(date) <= new Date()) { Swal.showValidationMessage('Pháº£i chá»n thá»i Ä‘iá»ƒm trong tÆ°Æ¡ng lai!'); return false; }
                     return date;
                 }
             });
@@ -87,9 +87,9 @@ export default {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ publishDate: result.value })
                 });
-                if (res.ok) { Swal.fire({ icon: 'success', title: 'Đã lên lịch!', timer: 1500, showConfirmButton: false }); fetchPending(); }
-                else { const d = await res.json(); Swal.fire('Lỗi', d.message || 'Lỗi', 'error'); }
-            } catch (e) { Swal.fire('Lỗi', 'Lỗi kết nối', 'error'); }
+                if (res.ok) { Swal.fire({ icon: 'success', title: 'ÄÃ£ lÃªn lá»‹ch!', timer: 1500, showConfirmButton: false }); fetchPending(); }
+                else { const d = await res.json(); Swal.fire('Lá»—i', d.message || 'Lá»—i', 'error'); }
+            } catch (e) { Swal.fire('Lá»—i', 'Lá»—i káº¿t ná»‘i', 'error'); }
         };
 
         onMounted(fetchPending);
@@ -100,23 +100,23 @@ export default {
         <div>
             <div class="mb-6 flex items-center justify-between">
                 <div>
-                    <h2 class="text-2xl font-bold text-black">Duyệt bài viết</h2>
-                    <p class="text-sm text-slate-500 mt-1">Quản lý quy trình biên tập</p>
+                    <h2 class="text-2xl font-bold text-black">Duyá»‡t bÃ i viáº¿t</h2>
+                    <p class="text-sm text-slate-500 mt-1">Quáº£n lÃ½ quy trÃ¬nh biÃªn táº­p</p>
                 </div>
                 <button @click="fetchPending" class="flex items-center gap-2 px-4 py-2 bg-white border border-stroke rounded-lg text-sm hover:bg-gray-50">
-                    <i class="bi bi-arrow-clockwise"></i> Làm mới
+                    <i class="bi bi-arrow-clockwise"></i> LÃ m má»›i
                 </button>
             </div>
 
             <div v-if="isLoading" class="text-center py-10 text-slate-500">
                 <div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                Đang tải...
+                Äang táº£i...
             </div>
 
             <div v-else-if="pendingPosts.length === 0" class="text-center py-20 bg-white rounded-lg border border-stroke">
                 <i class="bi bi-check-circle text-5xl text-green-500 mb-4 block"></i>
-                <p class="text-lg font-medium text-black">Không có bài viết nào chờ duyệt</p>
-                <p class="text-sm text-slate-500 mt-1">Tất cả bài viết đã được xử lý</p>
+                <p class="text-lg font-medium text-black">KhÃ´ng cÃ³ bÃ i viáº¿t nÃ o chá» duyá»‡t</p>
+                <p class="text-sm text-slate-500 mt-1">Táº¥t cáº£ bÃ i viáº¿t Ä‘Ã£ Ä‘Æ°á»£c xá»­ lÃ½</p>
             </div>
 
             <div v-else class="grid gap-4">
@@ -139,19 +139,19 @@ export default {
                             </div>
                         </div>
                         <div class="flex items-center gap-2 ml-4">
-                            <button @click="approve(post.id)" title="Duyệt"
+                            <button @click="approve(post.id)" title="Duyá»‡t"
                                 class="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition">
                                 <i class="bi bi-check-lg text-lg"></i>
                             </button>
-                            <button @click="reject(post.id)" title="Từ chối"
+                            <button @click="reject(post.id)" title="Tá»« chá»‘i"
                                 class="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition">
                                 <i class="bi bi-x-lg text-lg"></i>
                             </button>
-                            <button @click="schedule(post.id)" title="Lên lịch"
+                            <button @click="schedule(post.id)" title="LÃªn lá»‹ch"
                                 class="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition">
                                 <i class="bi bi-clock text-lg"></i>
                             </button>
-                            <button @click="viewLogs(post.id)" title="Xem lịch sử"
+                            <button @click="viewLogs(post.id)" title="Xem lá»‹ch sá»­"
                                 class="p-2 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 transition">
                                 <i class="bi bi-clock-history text-lg"></i>
                             </button>
@@ -161,7 +161,7 @@ export default {
                     <!-- Workflow Logs -->
                     <div v-if="selectedPostId === post.id && workflowLogs.length > 0"
                         class="mt-4 border-t border-stroke pt-4">
-                        <h5 class="text-sm font-medium text-black mb-2"><i class="bi bi-clock-history"></i> Lịch sử workflow</h5>
+                        <h5 class="text-sm font-medium text-black mb-2"><i class="bi bi-clock-history"></i> Lá»‹ch sá»­ workflow</h5>
                         <div class="space-y-2 max-h-40 overflow-y-auto">
                             <div v-for="log in workflowLogs" :key="log.id" class="flex items-start gap-3 text-xs p-2 bg-gray-50 rounded">
                                 <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-[10px] flex-shrink-0 mt-0.5">
@@ -182,3 +182,4 @@ export default {
         </div>
     `
 };
+

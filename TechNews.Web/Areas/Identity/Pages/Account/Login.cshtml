@@ -26,7 +26,7 @@
         <!-- Form Only -->
         <div class="w-full p-8 md:p-12">
             <div class="text-center mb-8">
-                 <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#9f224e]/10 text-[#9f224e] mb-4">
+                 <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#2563eb]/10 text-[#2563eb] mb-4">
                     <i class="bi bi-shield-lock-fill text-2xl"></i>
                 </div>
                 <h1 class="text-2xl font-bold text-gray-900">Đăng nhập</h1>
@@ -42,7 +42,7 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="bi bi-envelope text-gray-400"></i>
                         </div>
-                        <input asp-for="Input.Email" class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#9f224e] focus:border-[#9f224e] transition sm:text-sm" placeholder="user@example.com" />
+                        <input asp-for="Input.Email" class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2563eb] focus:border-[#2563eb] transition sm:text-sm" placeholder="user@example.com" />
                     </div>
                     <span asp-validation-for="Input.Email" class="text-red-500 text-xs mt-1"></span>
                 </div>
@@ -53,20 +53,20 @@
                          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="bi bi-lock text-gray-400"></i>
                         </div>
-                        <input asp-for="Input.Password" type="password" class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#9f224e] focus:border-[#9f224e] transition sm:text-sm" placeholder="••••••••" />
+                        <input asp-for="Input.Password" type="password" class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2563eb] focus:border-[#2563eb] transition sm:text-sm" placeholder="••••••••" />
                     </div>
                     <span asp-validation-for="Input.Password" class="text-red-500 text-xs mt-1"></span>
                 </div>
 
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center">
-                        <input asp-for="Input.RememberMe" type="checkbox" class="h-4 w-4 text-[#9f224e] focus:ring-[#9f224e] border-gray-300 rounded" />
+                        <input asp-for="Input.RememberMe" type="checkbox" class="h-4 w-4 text-[#2563eb] focus:ring-[#2563eb] border-gray-300 rounded" />
                         <label asp-for="Input.RememberMe" class="ml-2 block text-sm text-gray-900">Ghi nhớ tôi</label>
                     </div>
-                    <a href="#" class="text-sm font-medium text-[#9f224e] hover:underline">Quên mật khẩu?</a>
+                    <a href="#" class="text-sm font-medium text-[#2563eb] hover:underline">Quên mật khẩu?</a>
                 </div>
 
-                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#9f224e] hover:bg-[#851b41] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#9f224e] transition">
+                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#2563eb] hover:bg-[#1d4ed8] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2563eb] transition">
                     Đăng nhập hệ thống
                 </button>
             </form>
@@ -74,7 +74,7 @@
             <div class="mt-8 text-center">
                 <p class="text-sm text-gray-500">
                     Chưa có tài khoản? 
-                    <a href="/Identity/Account/Register" class="font-medium text-[#9f224e] hover:underline">Đăng ký ngay</a>
+                    <a href="/Identity/Account/Register" class="font-medium text-[#2563eb] hover:underline">Đăng ký ngay</a>
                 </p>
             </div>
         </div>
@@ -82,3 +82,4 @@
 
 </body>
 </html>
+

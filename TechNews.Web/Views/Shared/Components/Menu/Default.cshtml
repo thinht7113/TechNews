@@ -1,4 +1,4 @@
-@model List<TechNews.Domain.Entities.MenuItem>
+﻿@model List<TechNews.Domain.Entities.MenuItem>
 
 @foreach (var item in Model)
 {
@@ -37,3 +37,4 @@
         <a href="@item.Url" class="nav-link" @(item.OpenInNewTab ? "target='_blank'" : "")>@item.Title</a>
     }
 }
+

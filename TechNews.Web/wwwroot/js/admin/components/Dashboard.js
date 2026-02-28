@@ -27,7 +27,7 @@ export default {
                     datasets: [{
                         label: 'Bài viết mới',
                         data: stats.value.chart.data,
-                        borderColor: '#9f224e',
+                        borderColor: '#2563eb',
                         backgroundColor: 'rgba(159, 34, 78, 0.1)',
                         borderWidth: 2,
                         fill: true,

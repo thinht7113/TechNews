@@ -1,14 +1,14 @@
-@model List<TechNews.Domain.Entities.Post>
+﻿@model List<TechNews.Domain.Entities.Post>
 @{
-    ViewData["Title"] = "Thẻ: " + ViewBag.TagName;
+    ViewData["Title"] = "Tháº»: " + ViewBag.TagName;
 }
 
 <div class="max-w-[1280px] mx-auto px-4 py-8">
     <div class="mb-8 border-b border-gray-200 pb-4 flex items-baseline justify-between">
         <h1 class="text-3xl font-bold text-slate-800">
-            <span class="text-[#9f224e]">#</span> @ViewBag.TagName
+            <span class="text-[#2563eb]">#</span> @ViewBag.TagName
         </h1>
-        <span class="text-slate-500 text-sm">Kết quả tìm kiếm cho thẻ</span>
+        <span class="text-slate-500 text-sm">Káº¿t quáº£ tÃ¬m kiáº¿m cho tháº»</span>
     </div>
 
     @if (Model != null && Model.Any())
@@ -28,13 +28,13 @@
                     </a>
                     <div class="p-6 flex flex-col flex-1">
                         <div class="flex items-center gap-2 mb-3 text-xs text-slate-500 font-medium font-sans">
-                            <span class="text-[#9f224e] bg-[#9f224e]/5 px-2 py-0.5 rounded">
+                            <span class="text-[#2563eb] bg-[#2563eb]/5 px-2 py-0.5 rounded">
                                 @post.CreatedDate.ToString("dd MMMM, yyyy")
                             </span>
                              <span class="w-1 h-1 rounded-full bg-slate-300"></span>
                             <span>@post.Author?.UserName</span>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-3 leading-snug group-hover:text-[#9f224e] transition-colors line-clamp-2">
+                        <h3 class="text-xl font-bold text-slate-800 mb-3 leading-snug group-hover:text-[#2563eb] transition-colors line-clamp-2">
                             <a href="/post/@post.Slug">@post.Title</a>
                         </h3>
                         <p class="text-slate-500 text-sm leading-relaxed line-clamp-3 mb-4 flex-1">
@@ -51,7 +51,7 @@
              <div class="flex justify-center mt-12 gap-2">
                 @for (int i = 1; i <= ViewBag.TotalPages; i++)
                 {
-                    <a href="?page=@i" class="px-4 py-2 rounded-lg font-bold border transition-colors @(i == ViewBag.CurrentPage ? "bg-[#9f224e] text-white border-[#9f224e]" : "bg-white text-slate-700 border-gray-200 hover:bg-gray-50")">
+                    <a href="?page=@i" class="px-4 py-2 rounded-lg font-bold border transition-colors @(i == ViewBag.CurrentPage ? "bg-[#2563eb] text-white border-[#2563eb]" : "bg-white text-slate-700 border-gray-200 hover:bg-gray-50")">
                         @i
                     </a>
                 }
@@ -64,9 +64,10 @@
             <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
                 <i class="bi bi-tags text-4xl"></i>
             </div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">Chưa có bài viết nào</h3>
-            <p class="text-slate-500">Chúng tôi chưa tìm thấy bài viết nào gắn thẻ này.</p>
-            <a href="/" class="inline-block mt-6 px-6 py-2 bg-[#9f224e] text-white rounded-full font-bold hover:bg-[#851b41] transition">Về trang chủ</a>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">ChÆ°a cÃ³ bÃ i viáº¿t nÃ o</h3>
+            <p class="text-slate-500">ChÃºng tÃ´i chÆ°a tÃ¬m tháº¥y bÃ i viáº¿t nÃ o gáº¯n tháº» nÃ y.</p>
+            <a href="/" class="inline-block mt-6 px-6 py-2 bg-[#2563eb] text-white rounded-full font-bold hover:bg-[#1d4ed8] transition">Vá» trang chá»§</a>
         </div>
     }
 </div>
+
