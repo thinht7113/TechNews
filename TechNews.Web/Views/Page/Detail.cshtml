@@ -1,0 +1,26 @@
+@model TechNews.Domain.Entities.StaticPage
+@{
+    ViewData["Title"] = Model.Title + " - TechNews";
+}
+
+<div class="bg-white min-h-screen pt-24 pb-12 font-sans text-slate-900">
+    <div class="max-w-[800px] mx-auto px-4">
+        
+        <nav class="text-sm font-medium text-gray-500 mb-8 flex gap-2 items-center">
+            <a href="/" class="hover:text-primary transition">Trang chủ</a>
+            <span>/</span>
+            <span class="text-gray-800">@Model.Title</span>
+        </nav>
+
+        <article class="bg-white rounded-2xl shadow-soft p-8 md:p-12 border border-gray-100">
+            <h1 class="text-3xl md:text-4xl font-extrabold mb-8 pb-6 border-b border-gray-100 text-[#2563eb]">
+                @Model.Title
+            </h1>
+            
+            <div class="prose prose-lg prose-slate max-w-none prose-a:text-[#2563eb] hover:prose-a:text-[#1d4ed8]">
+                @Html.Raw(Model.Content)
+            </div>
+        </article>
+        
+    </div>
+</div>

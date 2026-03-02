@@ -1,0 +1,13 @@
+@model IEnumerable<TechNews.Domain.Entities.StaticPage>
+
+<h4 class="font-bold text-gray-900 text-lg mb-6">Thông tin</h4>
+<ul class="space-y-3 text-sm">
+    @foreach (var p in Model)
+    {
+        <li>
+            <a href="/page/@p.Slug" class="hover:text-primary transition-colors">
+                @p.Title
+            </a>
+        </li>
+    }
+</ul>
