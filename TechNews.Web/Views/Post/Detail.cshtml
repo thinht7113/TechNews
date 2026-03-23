@@ -21,6 +21,14 @@
              <span class="bg-blue-100 text-primary text-xs font-bold px-3 py-1 rounded-full">@Model.Category?.Name</span>
              <span class="text-gray-500 text-xs py-1"><i class="bi bi-clock"></i> @Model.CreatedDate.ToString("dd/MM/yyyy")</span>
              <span class="text-gray-500 text-xs py-1"><i class="bi bi-eye"></i> @Model.ViewCount</span>
+             
+             @if (User.Identity.IsAuthenticated)
+             {
+                 <button onclick="toggleSavePost(@Model.Id)" id="btnSavePost" class="ml-auto text-sm flex items-center gap-1.5 px-3 py-1 rounded-full border transition-colors @(ViewBag.IsSaved ? "bg-[#2563eb] text-white border-[#2563eb]" : "bg-white text-slate-500 border-slate-200 hover:border-[#2563eb] hover:text-[#2563eb]")">
+                     <i class="bi @(ViewBag.IsSaved ? "bi-bookmark-fill" : "bi-bookmark")" id="iconSavePost"></i> 
+                     <span id="textSavePost">@(ViewBag.IsSaved ? "Đã lưu" : "Lưu bài viết")</span>
+                 </button>
+             }
         </div>
         
         <h1 class="text-3xl md:text-5xl font-bold font-serif text-gray-900 leading-tight mb-6">
@@ -42,19 +50,20 @@
     }
 
     <!-- Content -->
-    <article class="prose prose-lg prose-blue max-w-none mb-12 font-serif text-gray-800 group-hover:text-gray-900">
+    <article class="prose prose-lg prose-blue max-w-none mb-12 font-serif text-gray-800">
         @Html.Raw(Model.Content)
     </article>
+    <div class="clear-both"></div>
 
     <!-- Share & Tags -->
-    <div class="border-t border-b border-gray-200 py-6 mb-12 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div class="flex gap-2">
+    <div class="border-t border-b border-gray-200 py-6 mb-12 flex flex-col md:flex-row justify-between items-start gap-4">
+        <div class="flex flex-wrap gap-2 items-center">
             <span class="font-bold text-gray-700">Tags:</span>
             @if (!string.IsNullOrEmpty(Model.Tags))
             {
                 @foreach(var tag in Model.Tags.Split(','))
                 {
-                    <a href="/post/search?query=@System.Net.WebUtility.UrlEncode(tag.Trim())" class="text-sm bg-gray-100 text-gray-600 px-3 py-1 rounded hover:bg-gray-200 transition">#@tag.Trim()</a>
+                    <a href="/post/search?query=@System.Net.WebUtility.UrlEncode(tag.Trim())" class="text-sm bg-gray-100 text-gray-600 px-3 py-1 rounded-full hover:bg-gray-200 transition whitespace-nowrap">#@tag.Trim()</a>
                 }
             }
         </div>
@@ -149,3 +158,92 @@
          }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function toggleSavePost(postId) {
+            const btn = document.getElementById('btnSavePost');
+            const icon = document.getElementById('iconSavePost');
+            const text = document.getElementById('textSavePost');
+            
+            // Disable button during request
+            btn.disabled = true;
+            btn.classList.add('opacity-70');
+            
+            fetch(`/Profile/ToggleSavePost/${postId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.isSaved) {
+                        btn.className = "ml-auto text-sm flex items-center gap-1.5 px-3 py-1 rounded-full border transition-colors bg-[#2563eb] text-white border-[#2563eb]";
+                        icon.className = "bi bi-bookmark-fill";
+                        text.innerText = "Đã lưu";
+                    } else {
+                        btn.className = "ml-auto text-sm flex items-center gap-1.5 px-3 py-1 rounded-full border transition-colors bg-white text-slate-500 border-slate-200 hover:border-[#2563eb] hover:text-[#2563eb]";
+                        icon.className = "bi bi-bookmark";
+                        text.innerText = "Lưu bài viết";
+                    }
+                }
+            })
+            .catch(error => console.error('Error toggling save:', error))
+            .finally(() => {
+                btn.disabled = false;
+                btn.classList.remove('opacity-70');
+            });
+        }
+    </script>
+
+    <!-- Analytics Tracking -->
+    <script>
+        (function() {
+            const postId = @Model.Id;
+            const sessionId = 'sid_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+            const startTime = Date.now();
+            let maxScroll = 0;
+            let tracked = false;
+
+            window.addEventListener('scroll', function() {
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                if (docHeight > 0) {
+                    const scrollPercent = Math.round((scrollTop / docHeight) * 100);
+                    if (scrollPercent > maxScroll) maxScroll = scrollPercent;
+                }
+            });
+
+            function sendTrack() {
+                if (tracked) return;
+                tracked = true;
+                const timeOnPage = Math.round((Date.now() - startTime) / 1000);
+                const data = JSON.stringify({
+                    postId: postId,
+                    sessionId: sessionId,
+                    referrer: document.referrer || '',
+                    timeOnPage: timeOnPage,
+                    scrollDepth: maxScroll
+                });
+                fetch('/api/v/record', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: data,
+                    keepalive: true
+                }).catch(e => console.error('T', e));
+            }
+
+            // Track when user leaves
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'hidden') sendTrack();
+            });
+            window.addEventListener('beforeunload', sendTrack);
+
+            // Also track after 30 seconds in case user stays on page
+            setTimeout(function() { if (!tracked) sendTrack(); }, 30000);
+        })();
+    </script>
+}

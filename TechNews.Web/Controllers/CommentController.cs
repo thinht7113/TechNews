@@ -37,7 +37,7 @@ namespace TechNews.Web.Controllers
                 PostId = postId,
                 UserId = user.Id,
                 Content = content,
-                CreatedDate = DateTime.Now,
+                CreatedDate = DateTime.UtcNow,
                 IsApproved = true
             };
 

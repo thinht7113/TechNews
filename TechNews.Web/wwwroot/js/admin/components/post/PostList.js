@@ -10,6 +10,16 @@ export default {
         const totalCount = ref(0);
         const pageSize = 20;
 
+        const statusLabels = {
+            0: 'Nháp', 1: 'Đã xuất bản', 2: 'Lưu trữ', 3: 'Ẩn',
+            4: 'Chờ duyệt', 5: 'Đang duyệt', 6: 'Từ chối', 7: 'Đã lên lịch'
+        };
+        const statusColors = {
+            0: 'bg-gray-100 text-gray-800', 1: 'bg-green-100 text-green-800', 2: 'bg-slate-100 text-slate-800',
+            3: 'bg-gray-100 text-gray-500', 4: 'bg-yellow-100 text-yellow-800', 5: 'bg-blue-100 text-blue-800',
+            6: 'bg-red-100 text-red-800', 7: 'bg-indigo-100 text-indigo-800'
+        };
+
         const fetchPosts = async (page = 1) => {
             loading.value = true;
             try {
@@ -59,7 +69,7 @@ export default {
 
         onMounted(() => fetchPosts(1));
 
-        return { posts, loading, deletePost, searchQuery, filteredPosts, currentPage, totalPages, totalCount, goToPage };
+        return { posts, loading, deletePost, searchQuery, filteredPosts, currentPage, totalPages, totalCount, goToPage, statusLabels, statusColors };
     },
     template: `
         <div>
@@ -107,11 +117,11 @@ export default {
                                         <a :href="'/post/'+ (item.slug || 'detail')" target="_blank" class="text-slate-600 hover:underline">Xem</a>
                                     </div>
                                 </td>
-                                <td class="py-4 px-4 text-sm">Admin</td>
+                                <td class="py-4 px-4 text-sm">{{ item.authorName || 'Quản trị viên' }}</td>
                                 <td class="py-4 px-4 text-sm text-black">{{ item.categoryName || 'Chưa phân loại' }}</td>
                                 <td class="py-4 px-4 text-sm">
-                                    <span :class="{'bg-green-100 text-green-800': item.status===1, 'bg-gray-100 text-gray-800': item.status!==1}" class="px-2 py-1 rounded text-xs font-semibold">
-                                        {{ item.status === 1 ? 'Đã đăng' : 'Bản nháp' }}
+                                    <span :class="statusColors[item.status]" class="px-2 py-1 rounded text-xs font-semibold whitespace-nowrap">
+                                        {{ statusLabels[item.status] || 'Không xác định' }}
                                     </span>
                                 </td>
                                 <td class="py-4 px-4 text-sm text-black">

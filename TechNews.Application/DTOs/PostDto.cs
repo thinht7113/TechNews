@@ -31,6 +31,9 @@ namespace TechNews.Application.DTOs
         
         [Display(Name = "Or Image URL")]
         public string? ThumbnailUrl { get; set; }
+
+        public string? AssignedEditorId { get; set; }
+        public System.DateTime? ScheduledPublishDate { get; set; }
     }
 
     public class EditPostDto : CreatePostDto

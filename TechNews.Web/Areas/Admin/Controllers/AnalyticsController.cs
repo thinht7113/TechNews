@@ -10,9 +10,8 @@ namespace TechNews.Web.Areas.Admin.Controllers
     {
         private readonly IAnalyticsService _analyticsService;
 
-        // Bug 7 fix: Simple IP-based rate limiting
         private static readonly ConcurrentDictionary<string, (int count, DateTime resetAt)> _rateLimits = new();
-        private const int MaxRequestsPerMinute = 10;
+        private const int MaxRequestsPerMinute = 30;
 
         public AnalyticsController(IAnalyticsService analyticsService)
         {
@@ -23,10 +22,9 @@ namespace TechNews.Web.Areas.Admin.Controllers
 
         /// <summary>
         /// Public endpoint — frontend JS sends tracking data here
-        /// Bug 7 fix: Rate limited to 10 requests/minute per IP
         /// </summary>
         [HttpPost]
-        [Route("api/analytics/track")]
+        [Route("api/v/record")]
         [AllowAnonymous]
         public async Task<IActionResult> Track([FromBody] TrackPageViewDto dto)
         {

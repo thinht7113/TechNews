@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using TechNews.Domain.Entities;
 using TechNews.Domain.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace TechNews.Web.Controllers
 {
@@ -9,17 +10,38 @@ namespace TechNews.Web.Controllers
     {
         private readonly IRepository<Subscriber> _subscriberRepo;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMemoryCache _cache;
 
-        public NewsletterController(IRepository<Subscriber> subscriberRepo, IUnitOfWork unitOfWork)
+        public NewsletterController(IRepository<Subscriber> subscriberRepo, IUnitOfWork unitOfWork, IMemoryCache cache)
         {
             _subscriberRepo = subscriberRepo;
             _unitOfWork = unitOfWork;
+            _cache = cache;
+        }
+
+        private bool IsRateLimited(string action)
+        {
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var cacheKey = $"Newsletter_{action}_{ip}";
+            var attempts = _cache.GetOrCreate(cacheKey, entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+                return 0;
+            });
+
+            if (attempts >= 5) return true; // Max 5 subscribe attempts per 10 min
+
+            _cache.Set(cacheKey, attempts + 1, TimeSpan.FromMinutes(10));
+            return false;
         }
 
         [HttpPost]
         [Route("api/newsletter/subscribe")]
         public async Task<IActionResult> Subscribe([FromBody] SubscribeRequest model)
         {
+            if (IsRateLimited("subscribe"))
+                return StatusCode(429, new { message = "Bạn đã thử quá nhiều lần. Vui lòng đợi." });
+
             if (!ModelState.IsValid)
                 return BadRequest(new { message = "Email không hợp lệ" });
 
@@ -40,7 +62,7 @@ namespace TechNews.Web.Controllers
             {
                 Email = model.Email,
                 IsActive = true,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTime.UtcNow
             };
 
             await _subscriberRepo.AddAsync(subscriber);
@@ -61,7 +83,7 @@ namespace TechNews.Web.Controllers
                 return NotFound(new { message = "Email chưa đăng ký nhận tin" });
 
             subscriber.IsActive = false;
-            subscriber.UnsubscribedDate = DateTime.Now;
+            subscriber.UnsubscribedDate = DateTime.UtcNow;
             await _subscriberRepo.UpdateAsync(subscriber);
             await _unitOfWork.CompleteAsync();
 

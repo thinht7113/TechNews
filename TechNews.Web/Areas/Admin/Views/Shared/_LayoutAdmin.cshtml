@@ -4,7 +4,7 @@
 
 @{
     var currentUser = await UserManager.GetUserAsync(User);
-    var fullName = currentUser?.FullName ?? User.Identity?.Name ?? "Admin";
+    var fullName = currentUser?.FullName ?? User.Identity?.Name?.Split('@')[0] ?? "Admin";
     var avatarUrl = currentUser?.Avatar ?? $"https://ui-avatars.com/api/?name={fullName}&background=9f224e&color=fff";
     
     var roles = currentUser != null ? await UserManager.GetRolesAsync(currentUser) : new List<string>();

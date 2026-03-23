@@ -60,19 +60,37 @@ export default {
         };
 
         const schedulePost = async () => {
+            isLoading.value = true;
+            let eligiblePosts = [];
+            try {
+                const res = await fetch('/api/calendar/eligible-posts');
+                if (res.ok) eligiblePosts = await res.json();
+            } catch (e) { console.error(e); }
+            isLoading.value = false;
+
+            if (eligiblePosts.length === 0) {
+                Swal.fire('Thông báo', 'Không có bài đăng nào chưa xuất bản hoặc đang chờ duyệt để lên lịch.', 'info');
+                return;
+            }
+
+            let optionsHtml = '<option value="">-- Chọn bài viết --</option>';
+            eligiblePosts.forEach(p => {
+                optionsHtml += `<option value="${p.id}">#${p.id} - ${p.title} (${statusLabels[p.status] || p.status})</option>`;
+            });
+
             const { value: formValues } = await Swal.fire({
                 title: 'Lên lịch xuất bản',
                 html: `
-                    <input id="swal-postid" class="swal2-input" placeholder="Post ID" type="number" />
-                    <input id="swal-date" class="swal2-input" type="datetime-local" />
+                    <select id="swal-postid" class="swal2-select w-full max-w-full px-2 py-2 mb-3 text-sm">${optionsHtml}</select>
+                    <input id="swal-date" class="swal2-input w-full max-w-full" type="datetime-local" />
                 `,
                 focusConfirm: false,
                 showCancelButton: true, confirmButtonText: 'Lên lịch', cancelButtonText: 'Hủy', confirmButtonColor: '#3b82f6',
                 preConfirm: () => {
                     const postId = document.getElementById('swal-postid').value;
                     const publishDate = document.getElementById('swal-date').value;
-                    if (!postId || !publishDate) { Swal.showValidationMessage('Nhập đầy đủ!'); return false; }
-                    if (new Date(publishDate) <= new Date()) { Swal.showValidationMessage('Phải trong tương lai!'); return false; }
+                    if (!postId || !publishDate) { Swal.showValidationMessage('Vui lòng chọn bài viết và ngày giờ!'); return false; }
+                    if (new Date(publishDate) <= new Date()) { Swal.showValidationMessage('Ngày giờ lên lịch phải diễn ra trong tương lai!'); return false; }
                     return { postId: parseInt(postId), publishDate };
                 }
             });

@@ -31,7 +31,20 @@ namespace TechNews.Web.Areas.Admin.Controllers
         public async Task<IActionResult> GetAll()
         {
             var categories = await _categoryRepo.GetAllAsync();
-            return Json(categories);
+            var postRepo = HttpContext.RequestServices.GetRequiredService<IRepository<Post>>();
+            var allPosts = await postRepo.GetAllAsync();
+
+            var result = categories.Select(c => new
+            {
+                c.Id,
+                c.Name,
+                c.Slug,
+                c.Description,
+                c.ParentId,
+                PostCount = allPosts.Count(p => p.CategoryId == c.Id && !p.IsDeleted)
+            });
+
+            return Json(result);
         }
 
         [HttpGet]

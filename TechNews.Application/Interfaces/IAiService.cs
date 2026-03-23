@@ -7,6 +7,7 @@ namespace TechNews.Application.Interfaces
         Task<List<string>> SuggestTagsAsync(string content);
         Task<string> ImproveWritingAsync(string content);
         Task<List<string>> GenerateTitlesAsync(string content);
+        Task<TechNews.Application.DTOs.SeoMetaResult> SuggestSeoMetaAsync(string content);
         Task<bool> IsConfiguredAsync();
     }
 }

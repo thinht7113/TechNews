@@ -1,4 +1,5 @@
-﻿using TechNews.Domain.Entities;
+using TechNews.Domain.Entities;
+using System;
 
 namespace TechNews.Web.Models
 {
@@ -15,6 +16,18 @@ namespace TechNews.Web.Models
 
         public List<string> TrendingTags { get; set; } = new();
         public List<CategorySection> CategorySections { get; set; } = new();
+        public List<Post> LatestPosts { get; set; } = new();
+        public List<RecentCommentItem> RecentComments { get; set; } = new();
+    }
+
+    public class RecentCommentItem
+    {
+        public string UserName { get; set; }
+        public string AvatarUrl { get; set; }
+        public string Content { get; set; }
+        public string PostTitle { get; set; }
+        public string PostSlug { get; set; }
+        public DateTime CreatedDate { get; set; }
     }
 
     public class CategorySection

@@ -132,6 +132,28 @@ namespace TechNews.Web.Areas.Admin.Controllers
                 return StatusCode(500, new { message = $"Lỗi AI: {ex.Message}" });
             }
         }
+
+        [HttpPost]
+        [Route("api/ai/suggest-seo")]
+        public async Task<IActionResult> SuggestSeoMeta([FromBody] AiContentDto dto)
+        {
+            if (string.IsNullOrEmpty(dto?.Content))
+                return BadRequest(new { message = "Nội dung là bắt buộc." });
+
+            try
+            {
+                var seoMeta = await _aiService.SuggestSeoMetaAsync(dto.Content);
+                return Ok(new { success = true, meta = seoMeta });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Lỗi AI: {ex.Message}" });
+            }
+        }
     }
 
     public class AiPromptDto

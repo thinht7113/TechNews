@@ -13,6 +13,7 @@ import CommentList from './components/CommentList.js';
 
 import MenuBuilder from './components/MenuBuilder.js';
 import TagList from './components/TagList.js';
+import ContactList from './components/ContactList.js';
 import NewsletterManager from './components/NewsletterManager.js';
 
 // Content Marketing Platform Components
@@ -42,6 +43,7 @@ const routes = [
 
     { path: '/Admin/Menu', component: MenuBuilder },
     { path: '/Admin/Tag', component: TagList },
+    { path: '/Admin/Contact', component: ContactList },
     { path: '/Admin/Newsletter', component: NewsletterManager },
 
     // Content Marketing Platform Routes

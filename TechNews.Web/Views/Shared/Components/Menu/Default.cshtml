@@ -1,12 +1,18 @@
 @model List<TechNews.Domain.Entities.MenuItem>
+@{
+    var currentUrl = Context.Request.Path.Value;
+}
 
 @foreach (var item in Model)
 {
+    var isActive = !string.IsNullOrEmpty(item.Url) && item.Url != "/" && currentUrl != null && currentUrl.StartsWith(item.Url, StringComparison.OrdinalIgnoreCase);
+    var activeClass = isActive ? "bg-[#2563eb]/10 text-[#2563eb] font-semibold shadow-[0_2px_10px_-3px_rgba(37,99,235,0.2)]" : "text-slate-600 font-medium hover:bg-slate-100/80 hover:text-slate-900";
+    
     if (item.SubItems != null && item.SubItems.Any())
     {
         <!-- Dropdown -->
         <div class="relative group" x-data="{ open: false }" @@mouseenter="open = true" @@mouseleave="open = false">
-            <a href="@item.Url" class="nav-link flex items-center gap-1 cursor-pointer" 
+            <a href="@item.Url" class="nav-link block lg:inline-flex px-4 py-3 lg:py-2 rounded-xl lg:rounded-full transition-all duration-300 flex items-center justify-between lg:justify-start gap-1 cursor-pointer @activeClass" 
                @(item.OpenInNewTab ? "target='_blank'" : "")>
                 @item.Title <i class="bi bi-chevron-down text-xs transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
             </a>
@@ -23,7 +29,7 @@
                 <div class="bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden py-1">
                     @foreach (var sub in item.SubItems.OrderBy(s => s.Order))
                     {
-                        <a href="@sub.Url" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary transition-colors"
+                        <a href="@sub.Url" class="block px-4 py-2.5 mx-1 rounded-md text-sm @(currentUrl != null && currentUrl.Equals(sub.Url, StringComparison.OrdinalIgnoreCase) ? "text-[#2563eb] bg-blue-50/50 font-semibold" : "text-slate-700 hover:bg-slate-50 hover:text-[#2563eb]") transition-colors"
                            @(sub.OpenInNewTab ? "target='_blank'" : "")>
                             @sub.Title
                         </a>
@@ -34,6 +40,6 @@
     }
     else
     {
-        <a href="@item.Url" class="nav-link" @(item.OpenInNewTab ? "target='_blank'" : "")>@item.Title</a>
+        <a href="@item.Url" class="nav-link block lg:inline-flex px-4 py-3 lg:py-2 rounded-xl lg:rounded-full transition-all duration-300 @activeClass" @(item.OpenInNewTab ? "target='_blank'" : "")>@item.Title</a>
     }
 }

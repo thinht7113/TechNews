@@ -101,7 +101,7 @@ namespace TechNews.Application.Services
         {
             var posts = await _postRepo.GetAllAsync(p => p.Author, p => p.Category);
             return posts
-                .Where(p => p.Status == PostStatus.InReview && !p.IsDeleted)
+                .Where(p => (p.Status == PostStatus.InReview || p.Status == PostStatus.Pending) && !p.IsDeleted)
                 .OrderByDescending(p => p.ModifiedDate)
                 .Select(p => new
                 {
@@ -109,7 +109,7 @@ namespace TechNews.Application.Services
                     p.Title,
                     p.ShortDescription,
                     p.Slug,
-                    Status = (int)p.Status, // Bug 4 fix: numeric for frontend statusLabels
+                    Status = (int)p.Status,
                     CategoryName = p.Category?.Name,
                     AuthorName = p.Author?.FullName ?? p.Author?.Email,
                     p.CreatedDate,
@@ -125,11 +125,11 @@ namespace TechNews.Application.Services
                 .Select(l => new
                 {
                     l.Id,
-                    FromStatus = (int)l.FromStatus, // Bug 5 fix: numeric for frontend
+                    FromStatus = (int)l.FromStatus,
                     ToStatus = (int)l.ToStatus,
                     User = l.User?.FullName ?? l.User?.Email ?? l.UserId,
                     l.Comment,
-                    l.CreatedDate // Bug 5 fix: use CreatedDate not Date
+                    l.CreatedDate
                 });
         }
 

@@ -1,0 +1,43 @@
+@{
+    Layout = "_Layout";
+}
+
+<div class="bg-slate-50 min-h-[calc(100vh-80px)] pt-24 pb-12">
+    <div class="max-w-[1000px] mx-auto px-4">
+        
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Sidebar -->
+            <aside class="w-full md:w-64 flex-shrink-0">
+                <div class="bg-white rounded-2xl shadow-soft p-4 border border-gray-100 sticky top-28">
+                    <nav class="flex flex-col gap-1">
+                        <a href="/Profile" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "bg-[#2563eb] text-white shadow-glow" : "text-slate-600 hover:bg-slate-50 hover:text-[#2563eb]")">
+                            <i class="bi bi-person-circle text-lg opacity-80"></i>
+                            Thông tin chung
+                        </a>
+                        <a href="/Profile/Comments" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors @(ViewContext.RouteData.Values["action"]?.ToString() == "Comments" ? "bg-[#2563eb] text-white shadow-glow" : "text-slate-600 hover:bg-slate-50 hover:text-[#2563eb]")">
+                            <i class="bi bi-chat-left-text text-lg opacity-80"></i>
+                            Ý kiến của bạn
+                        </a>
+                        <a href="/Profile/Saved" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors @(ViewContext.RouteData.Values["action"]?.ToString() == "Saved" ? "bg-[#2563eb] text-white shadow-glow" : "text-slate-600 hover:bg-slate-50 hover:text-[#2563eb]")">
+                            <i class="bi bi-bookmark-fill text-lg opacity-80"></i>
+                            Tin đã lưu
+                        </a>
+                        <a href="/Profile/History" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors @(ViewContext.RouteData.Values["action"]?.ToString() == "History" ? "bg-[#2563eb] text-white shadow-glow" : "text-slate-600 hover:bg-slate-50 hover:text-[#2563eb]")">
+                            <i class="bi bi-clock-history text-lg opacity-80"></i>
+                            Tin đã xem
+                        </a>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 bg-white rounded-2xl shadow-soft border border-gray-100 p-6 md:p-8">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}

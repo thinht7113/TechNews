@@ -13,7 +13,6 @@ namespace TechNews.Application.Services
         private readonly HttpClient _httpClient;
         private readonly IRepository<SystemSetting> _settingRepo;
 
-        // Bug 2 fix: Thread-safe caching with SemaphoreSlim
         private readonly SemaphoreSlim _cacheLock = new(1, 1);
         private string? _cachedApiKey;
         private string? _cachedProvider;
@@ -26,7 +25,6 @@ namespace TechNews.Application.Services
             _settingRepo = settingRepo;
         }
 
-        // Bug 1 fix: Changed from sync property to async method — no more .GetAwaiter().GetResult() deadlock
         public async Task<bool> IsConfiguredAsync()
         {
             await RefreshSettingsIfNeeded();
@@ -68,7 +66,13 @@ namespace TechNews.Application.Services
             return ParseJsonList(response);
         }
 
-        // Bug 8 fix: Robust JSON parsing — strips markdown code fences before attempting parse
+        public async Task<TechNews.Application.DTOs.SeoMetaResult> SuggestSeoMetaAsync(string content)
+        {
+            var prompt = $"Đề xuất nội dung SEO Meta cho bài viết sau. Trả về đúng 1 JSON object với 2 chuỗi là 'Title' (tối đa 60 ký tự) và 'Description' (tối đa 160 ký tự). Chỉ trả về JSON object, không có văn bản nào khác. Ví dụ: {{\"Title\":\"Tiêu đề\",\"Description\":\"Mô tả\"}}\n\nNội dung bài viết:\n{content}";
+            var response = await CallAiAsync("Bạn là chuyên gia SEO xuất sắc.", prompt);
+            return ParseSeoMetaJson(response);
+        }
+
         private static List<string> ParseJsonList(string response)
         {
             try
@@ -92,6 +96,29 @@ namespace TechNews.Application.Services
             catch
             {
                 return new List<string> { response };
+            }
+        }
+
+        private static TechNews.Application.DTOs.SeoMetaResult ParseSeoMetaJson(string response)
+        {
+            try
+            {
+                var cleaned = response.Trim();
+                // Strip markdown code fences
+                cleaned = Regex.Replace(cleaned, @"^```\w*\s*", "", RegexOptions.Multiline);
+                cleaned = Regex.Replace(cleaned, @"```\s*$", "", RegexOptions.Multiline);
+                cleaned = cleaned.Trim();
+
+                if (cleaned.StartsWith("{"))
+                {
+                    var result = JsonSerializer.Deserialize<TechNews.Application.DTOs.SeoMetaResult>(cleaned, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    return result ?? new TechNews.Application.DTOs.SeoMetaResult { Title = "", Description = "" };
+                }
+                return new TechNews.Application.DTOs.SeoMetaResult { Title = cleaned.Length > 60 ? cleaned.Substring(0, 60) : cleaned, Description = "" };
+            }
+            catch
+            {
+                return new TechNews.Application.DTOs.SeoMetaResult { Title = "", Description = "" };
             }
         }
 
@@ -184,7 +211,6 @@ namespace TechNews.Application.Services
                 .GetString() ?? string.Empty;
         }
 
-        // Bug 2 fix: Thread-safe settings refresh with SemaphoreSlim
         private async Task RefreshSettingsIfNeeded()
         {
             if (DateTime.Now < _cacheExpiry) return;

@@ -11,10 +11,14 @@ namespace TechNews.Web.Areas.Admin.Controllers
     public class PostController : Controller
     {
         private readonly IPostService _postService;
+        private readonly IArticleScraperService _scraperService;
+        private readonly IWebHostEnvironment _env;
 
-        public PostController(IPostService postService)
+        public PostController(IPostService postService, IArticleScraperService scraperService, IWebHostEnvironment env)
         {
             _postService = postService;
+            _scraperService = scraperService;
+            _env = env;
         }
 
         public IActionResult Index() => View("Spa");
@@ -22,6 +26,75 @@ namespace TechNews.Web.Areas.Admin.Controllers
         public IActionResult CreateView() => View("Spa");
         [Route("Edit/{id?}")]
         public IActionResult EditView(int id) => View("Spa");
+
+        [HttpPost]
+        [Route("api/post/scrape-url")]
+        public async Task<IActionResult> ScrapeUrl([FromBody] ScrapeUrlRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request?.Url))
+                return BadRequest(new { success = false, message = "Vui lòng nhập URL." });
+
+            var result = await _scraperService.ScrapeAsync(request.Url);
+            if (!result.Success)
+                return BadRequest(new { success = false, message = result.ErrorMessage });
+
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0");
+            httpClient.Timeout = TimeSpan.FromSeconds(15);
+
+            var uploadDir = Path.Combine(_env.WebRootPath, "uploads", "images");
+            Directory.CreateDirectory(uploadDir);
+            var thumbDir = Path.Combine(_env.WebRootPath, "uploads", "thumbnails");
+            Directory.CreateDirectory(thumbDir);
+
+            // Download thumbnail
+            var localThumbnail = result.ThumbnailUrl;
+            if (!string.IsNullOrEmpty(result.ThumbnailUrl) && result.ThumbnailUrl.StartsWith("http"))
+            {
+                localThumbnail = await DownloadImageAsync(httpClient, result.ThumbnailUrl, thumbDir, "thumbnails");
+            }
+
+            // Download all content images and replace URLs
+            var contentHtml = result.Content ?? "";
+            var imgMatches = System.Text.RegularExpressions.Regex.Matches(contentHtml, @"<img[^>]+src=""([^""]+)""");
+            foreach (System.Text.RegularExpressions.Match match in imgMatches)
+            {
+                var originalUrl = match.Groups[1].Value;
+                if (originalUrl.StartsWith("http"))
+                {
+                    var localUrl = await DownloadImageAsync(httpClient, originalUrl, uploadDir, "images");
+                    contentHtml = contentHtml.Replace(originalUrl, localUrl);
+                }
+            }
+
+            return Ok(new
+            {
+                success = true,
+                title = result.Title,
+                shortDescription = result.ShortDescription,
+                content = contentHtml,
+                thumbnailUrl = localThumbnail,
+                tags = result.Tags,
+                sourceUrl = result.SourceUrl
+            });
+        }
+
+        private async Task<string> DownloadImageAsync(HttpClient httpClient, string imageUrl, string saveDir, string folder)
+        {
+            try
+            {
+                var bytes = await httpClient.GetByteArrayAsync(imageUrl);
+                var ext = Path.GetExtension(new Uri(imageUrl).AbsolutePath);
+                if (string.IsNullOrEmpty(ext) || ext.Length > 5) ext = ".jpg";
+                var fileName = $"{Guid.NewGuid()}_vne{ext}";
+                await System.IO.File.WriteAllBytesAsync(Path.Combine(saveDir, fileName), bytes);
+                return $"/uploads/{folder}/{fileName}";
+            }
+            catch
+            {
+                return imageUrl; // Keep original URL on failure
+            }
+        }
 
 
         [HttpGet]
@@ -210,5 +283,10 @@ namespace TechNews.Web.Areas.Admin.Controllers
              }
              return Json(new { error = new { message = "Upload failed" } });
         }
+    }
+
+    public class ScrapeUrlRequest
+    {
+        public string Url { get; set; } = "";
     }
 }

@@ -48,6 +48,21 @@ namespace TechNews.Web.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Route("api/user/getalleditors")]
+        public async Task<IActionResult> GetAllEditors()
+        {
+            var adminUsers = await _userManager.GetUsersInRoleAsync("Admin");
+            var editorUsers = await _userManager.GetUsersInRoleAsync("Editor");
+            
+            var allEditors = adminUsers.Concat(editorUsers)
+                .Select(u => new { u.Id, u.FullName, u.Email })
+                .Distinct()
+                .ToList();
+
+            return Ok(allEditors);
+        }
+
+        [HttpGet]
         [Route("api/user/get/{id}")]
         public async Task<IActionResult> Get(string id)
         {

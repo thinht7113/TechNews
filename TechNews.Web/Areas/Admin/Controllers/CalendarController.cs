@@ -31,7 +31,6 @@ namespace TechNews.Web.Areas.Admin.Controllers
             var from = start ?? DateTime.Now.AddMonths(-1);
             var to = end ?? DateTime.Now.AddMonths(2);
 
-            // Bug 6 fix: filter at DB level instead of loading all posts
             var posts = await _postRepo.FindAsync(
                 p => !p.IsDeleted && (
                     p.Status == PostStatus.Published ||
@@ -68,6 +67,28 @@ namespace TechNews.Web.Areas.Admin.Controllers
             return Ok(events);
         }
 
+        [HttpGet]
+        [Route("api/calendar/eligible-posts")]
+        public async Task<IActionResult> GetEligiblePosts()
+        {
+            var posts = await _postRepo.FindAsync(
+                p => !p.IsDeleted && (
+                    p.Status == PostStatus.Draft ||
+                    p.Status == PostStatus.Pending ||
+                    p.Status == PostStatus.InReview ||
+                    p.Status == PostStatus.Scheduled
+                )
+            );
+
+            var result = posts.OrderByDescending(p => p.CreatedDate).Select(p => new {
+                id = p.Id,
+                title = p.Title,
+                status = p.Status.ToString()
+            }).ToList();
+
+            return Ok(result);
+        }
+
         [HttpPost]
         [Route("api/calendar/schedule")]
         public async Task<IActionResult> Schedule([FromBody] CalendarScheduleDto dto)
@@ -85,7 +106,7 @@ namespace TechNews.Web.Areas.Admin.Controllers
             post.ScheduledPublishDate = dto.PublishDate;
             post.ModifiedDate = DateTime.Now;
             await _postRepo.UpdateAsync(post);
-            await _unitOfWork.CompleteAsync(); // Bug 3 fix: commit changes to database
+            await _unitOfWork.CompleteAsync();
 
             return Ok(new { success = true, message = $"Đã lên lịch xuất bản lúc {dto.PublishDate:dd/MM/yyyy HH:mm}." });
         }

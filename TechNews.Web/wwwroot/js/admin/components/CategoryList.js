@@ -13,6 +13,30 @@ export default {
             } finally { loading.value = false; }
         };
 
+        const sortedCategories = Vue.computed(() => {
+            const parents = categories.value.filter(c => !c.parentId);
+            const result = [];
+
+            parents.forEach(p => {
+                p.isSub = false;
+                result.push(p);
+                // Find children
+                const children = categories.value.filter(c => c.parentId === p.id);
+                children.forEach(c => {
+                    c.isSub = true;
+                    result.push(c);
+                });
+            });
+            // If any orphans (shouldn't happen but just in case)
+            categories.value.forEach(c => {
+                if (!result.find(r => r.id === c.id)) {
+                    c.isSub = false;
+                    result.push(c);
+                }
+            });
+            return result;
+        });
+
         const deleteCategory = async (id) => {
             const result = await Swal.fire({
                 title: 'Xóa danh mục?',
@@ -33,7 +57,7 @@ export default {
         };
 
         onMounted(fetchCategories);
-        return { categories, loading, deleteCategory };
+        return { categories, sortedCategories, loading, deleteCategory };
     },
     template: `
         <div>
@@ -50,15 +74,21 @@ export default {
                             <th class="py-4 px-4 font-medium text-black pl-8">Tên</th>
                             <th class="py-4 px-4 font-medium text-black">Slug</th>
                             <th class="py-4 px-4 font-medium text-black">Mô tả</th>
+                            <th class="py-4 px-4 font-medium text-black text-center">Số bài viết</th>
                             <th class="py-4 px-4 font-medium text-black text-right">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-if="loading"><td colspan="4" class="p-4 text-center">Đang tải...</td></tr>
-                        <tr v-else v-for="cat in categories" :key="cat.id" class="border-b border-stroke hover:bg-gray-50">
-                            <td class="py-4 px-4 pl-8 font-medium text-black">{{ cat.name }}</td>
+                        <tr v-if="loading"><td colspan="5" class="p-4 text-center">Đang tải...</td></tr>
+                        <tr v-else v-for="cat in sortedCategories" :key="cat.id" class="border-b border-stroke hover:bg-gray-50">
+                            <td class="py-4 px-4 font-medium text-black" :class="cat.isSub ? 'pl-12 text-slate-600' : 'pl-8'">
+                                <span v-if="cat.isSub" class="mr-2 text-slate-300">↳</span>{{ cat.name }}
+                            </td>
                             <td class="py-4 px-4 text-sm text-slate-500">{{ cat.slug }}</td>
                             <td class="py-4 px-4 text-sm">{{ cat.description }}</td>
+                            <td class="py-4 px-4 text-center">
+                                <span class="inline-flex items-center justify-center min-w-[28px] px-2 py-0.5 rounded-full text-xs font-bold" :class="cat.postCount > 0 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-400'">{{ cat.postCount }}</span>
+                            </td>
                             <td class="py-4 px-4 text-right">
                                 <router-link :to="'/Admin/Category/Edit/' + cat.id" class="text-primary hover:underline mr-4">Sửa</router-link>
                                 <button @click="deleteCategory(cat.id)" class="text-danger hover:underline">Xóa</button>

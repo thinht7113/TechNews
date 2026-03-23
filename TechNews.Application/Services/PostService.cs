@@ -38,7 +38,7 @@ namespace TechNews.Application.Services
 
         public async Task<IEnumerable<object>> GetAllPostsAsync(string? userId = null, bool isAdmin = false)
         {
-            var posts = await _postRepo.GetAllAsync(p => p.Category);
+            var posts = await _postRepo.GetAllAsync(p => p.Category, p => p.Author);
             var query = posts.Where(p => !p.IsDeleted);
             
             if (!isAdmin && !string.IsNullOrEmpty(userId))
@@ -51,6 +51,7 @@ namespace TechNews.Application.Services
                 p.Title,
                 p.Slug,
                 CategoryName = p.Category?.Name,
+                AuthorName = p.Author?.FullName ?? p.Author?.Email ?? "Quản trị viên",
                 p.CreatedDate,
                 p.Status,
                 p.Thumbnail
@@ -137,6 +138,8 @@ namespace TechNews.Application.Services
             post.MetaDescription = dto.MetaDescription;
             post.Tags = dto.Tags;
             post.ModifiedDate = DateTime.Now;
+            post.AssignedEditorId = dto.AssignedEditorId;
+            post.ScheduledPublishDate = dto.ScheduledPublishDate;
 
             if (dto.ThumbnailFile != null)
             {
@@ -206,7 +209,7 @@ namespace TechNews.Application.Services
 
         public async Task<IEnumerable<object>> GetTrashAsync(string? userId = null, bool isAdmin = false)
         {
-            var posts = await _postRepo.GetAllAsync(p => p.Category);
+            var posts = await _postRepo.GetAllAsync(p => p.Category, p => p.Author);
             var query = posts.Where(p => p.IsDeleted);
             
             if (!isAdmin && !string.IsNullOrEmpty(userId))
@@ -219,6 +222,7 @@ namespace TechNews.Application.Services
                 p.Title,
                 p.Slug,
                 CategoryName = p.Category?.Name,
+                AuthorName = p.Author?.FullName ?? p.Author?.Email ?? "Quản trị viên",
                 p.CreatedDate,
                 p.Status,
                 p.Thumbnail

@@ -8,8 +8,21 @@ export default {
         const isEdit = computed(() => !!route.params.id);
         const form = reactive({ name: '', slug: '', description: '', parentId: null });
         const loading = ref(false);
+        const categories = ref([]);
 
         onMounted(async () => {
+            // Load categories for parent dropdown
+            try {
+                const catRes = await fetch('/api/category/getall');
+                if (catRes.ok) {
+                    const allCat = await catRes.json();
+                    // Exclude current category from parent options if editing
+                    categories.value = isEdit.value
+                        ? allCat.filter(c => c.id != route.params.id)
+                        : allCat;
+                }
+            } catch (e) { console.error(e); }
+
             if (isEdit.value) {
                 loading.value = true;
                 const res = await fetch(`/api/category/get/${route.params.id}`);
@@ -38,7 +51,7 @@ export default {
             }
         };
 
-        return { form, isEdit, loading, submit };
+        return { form, isEdit, loading, categories, submit };
     },
     template: `
         <div class="max-w-2xl mx-auto">
@@ -58,6 +71,13 @@ export default {
                     <div>
                         <label class="mb-2 block text-sm font-medium text-black">Slug (Đường dẫn)</label>
                         <input v-model="form.slug" type="text" class="w-full rounded border border-stroke px-4 py-2 focus:border-primary outline-none" placeholder="tự-động-tạo-nếu-để-trống" />
+                    </div>
+                    <div>
+                        <label class="mb-2 block text-sm font-medium text-black">Chuyên mục cha (tùy chọn)</label>
+                        <select v-model="form.parentId" class="w-full rounded border border-stroke px-4 py-2 focus:border-primary outline-none">
+                            <option :value="null">-- Không có chuyên mục cha (Gốc) --</option>
+                            <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+                        </select>
                     </div>
                     <div>
                         <label class="mb-2 block text-sm font-medium text-black">Mô tả</label>

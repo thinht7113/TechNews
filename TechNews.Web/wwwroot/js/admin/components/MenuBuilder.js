@@ -1,4 +1,4 @@
-const { ref, reactive, onMounted } = Vue;
+const { ref, reactive, onMounted, computed } = Vue;
 
 export default {
     setup() {
@@ -53,8 +53,27 @@ export default {
             }
         };
 
+        const parentItems = computed(() => {
+            return menuItems.value.filter(m => !m.parentId && (!isEdit.value || m.id !== form.id));
+        });
+
+        const sortedItems = computed(() => {
+            const parents = menuItems.value.filter(m => !m.parentId).sort((a, b) => a.order - b.order);
+            const result = [];
+            parents.forEach(p => {
+                p.isSub = false;
+                result.push(p);
+                const children = menuItems.value.filter(m => m.parentId === p.id).sort((a, b) => a.order - b.order);
+                children.forEach(c => {
+                    c.isSub = true;
+                    result.push(c);
+                });
+            });
+            return result;
+        });
+
         onMounted(fetchMenu);
-        return { menuItems, loading, deleteItem, editItem, form, isEdit, submit, resetForm };
+        return { menuItems, sortedItems, parentItems, loading, deleteItem, editItem, form, isEdit, submit, resetForm };
     },
     template: `
         <div>
@@ -74,7 +93,14 @@ export default {
                                 <input v-model="form.url" type="text" class="w-full border border-stroke rounded px-3 py-2 outline-none focus:border-primary" />
                             </div>
                             <div>
-                                <label class="block text-black font-medium mb-1">Thứ tự</label>
+                                <label class="block text-black font-medium mb-1">Menu cha (tùy chọn)</label>
+                                <select v-model="form.parentId" class="w-full border border-stroke rounded px-3 py-2 outline-none focus:border-primary">
+                                    <option :value="null">-- Không có menu cha (Gốc) --</option>
+                                    <option v-for="p in parentItems" :key="p.id" :value="p.id">{{ p.title }}</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-black font-medium mb-1">Thứ tự hiển thị</label>
                                 <input v-model="form.order" type="number" class="w-full border border-stroke rounded px-3 py-2 outline-none focus:border-primary" />
                             </div>
                             <div class="flex items-center gap-2">
@@ -95,9 +121,13 @@ export default {
                          <div v-if="loading" class="text-center">Đang tải...</div>
                          <div v-else>
                              <ul class="space-y-2">
-                                 <li v-for="item in menuItems" :key="item.id" class="border border-stroke rounded p-3 flex justify-between items-center bg-gray-50">
+                                 <li v-for="item in sortedItems" :key="item.id" class="border border-stroke rounded p-3 flex justify-between items-center bg-gray-50"
+                                     :class="item.isSub ? 'ml-8 bg-white border-l-4 border-l-primary' : ''">
                                      <div>
-                                         <div class="font-bold text-black">{{ item.title }}</div>
+                                         <div class="font-bold text-black flex items-center gap-2">
+                                            <i v-if="item.isSub" class="bi bi-arrow-return-right text-slate-400"></i>
+                                            {{ item.title }}
+                                         </div>
                                          <div class="text-xs text-slate-500">{{ item.url }} (Order: {{ item.order }})</div>
                                      </div>
                                      <div class="flex gap-2">

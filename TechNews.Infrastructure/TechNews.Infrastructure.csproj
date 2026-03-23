@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TechNews.Domain\TechNews.Domain.csproj" />
+    <ProjectReference Include="..\TechNews.Application\TechNews.Application.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -11,6 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" />

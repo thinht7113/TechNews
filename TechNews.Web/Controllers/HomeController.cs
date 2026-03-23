@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using TechNews.Web.Models;
@@ -15,15 +15,17 @@ namespace TechNews.Web.Controllers
         private readonly IRepository<Post> _postRepo;
         private readonly IRepository<Contact> _contactRepo;
         private readonly IRepository<Tag> _tagRepo;
+        private readonly IRepository<Comment> _commentRepo;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMemoryCache _cache;
 
-        public HomeController(ILogger<HomeController> logger, IRepository<Post> postRepo, IRepository<Contact> contactRepo, IRepository<Tag> tagRepo, IUnitOfWork unitOfWork, IMemoryCache cache)
+        public HomeController(ILogger<HomeController> logger, IRepository<Post> postRepo, IRepository<Contact> contactRepo, IRepository<Tag> tagRepo, IRepository<Comment> commentRepo, IUnitOfWork unitOfWork, IMemoryCache cache)
         {
             _logger = logger;
             _postRepo = postRepo;
             _contactRepo = contactRepo;
             _tagRepo = tagRepo;
+            _commentRepo = commentRepo;
             _unitOfWork = unitOfWork;
             _cache = cache;
         }
@@ -53,7 +55,7 @@ namespace TechNews.Web.Controllers
                         CategoryId = g.Key.Id,
                         CategoryName = g.Key.Name,
                         CategorySlug = g.Key.Slug,
-                        Posts = g.OrderByDescending(p => p.CreatedDate).Take(4).ToList()
+                        Posts = g.OrderByDescending(p => p.CreatedDate).Take(5).ToList()
                     })
                     .OrderBy(c => c.CategoryName)
                     .ToList();
@@ -66,6 +68,23 @@ namespace TechNews.Web.Controllers
                     .Select(t => t.Name)
                     .ToList();
 
+                var latestPosts = allPosts.Take(5).ToList();
+
+                var recentComments = (await _commentRepo.GetAllAsync(c => c.User, c => c.Post))
+                    .Where(c => c.IsApproved && c.Post != null && !c.Post.IsDeleted)
+                    .OrderByDescending(c => c.CreatedDate)
+                    .Take(5)
+                    .Select(c => new RecentCommentItem
+                    {
+                        UserName = c.User?.FullName ?? c.User?.Email ?? "Ẩn danh",
+                        AvatarUrl = c.User?.Avatar,
+                        Content = c.Content.Length > 80 ? c.Content.Substring(0, 80) + "..." : c.Content,
+                        PostTitle = c.Post.Title,
+                        PostSlug = c.Post.Slug,
+                        CreatedDate = c.CreatedDate
+                    })
+                    .ToList();
+
                 return new HomeIndexViewModel
                 {
                     FeaturedMain = featuredMain,
@@ -73,7 +92,9 @@ namespace TechNews.Web.Controllers
                     LatestStream = latestStream,
                     MostViewed = mostViewed,
                     CategorySections = categorySections,
-                    TrendingTags = trendingTags
+                    TrendingTags = trendingTags,
+                    LatestPosts = latestPosts,
+                    RecentComments = recentComments
                 };
             });
 
@@ -89,7 +110,7 @@ namespace TechNews.Web.Controllers
              if (tag == null) return NotFound();
 
              int pageSize = 12;
-             var posts = (await _postRepo.FindAsync(p => p.PostTags.Any(pt => pt.TagId == tag.Id), p => p.Category, p => p.Author))
+             var posts = (await _postRepo.FindAsync(p => p.PostTags.Any(pt => pt.TagId == tag.Id) && !p.IsDeleted && p.Status == PostStatus.Published, p => p.Category, p => p.Author))
                         .OrderByDescending(p => p.CreatedDate)
                         .ToList();
              
@@ -121,7 +142,7 @@ namespace TechNews.Web.Controllers
                     Email = model.Email,
                     Subject = model.Subject,
                     Message = model.Message,
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.UtcNow,
                     IsRead = false
                 };
 
@@ -141,6 +162,7 @@ namespace TechNews.Web.Controllers
             int skip = 15 + ((page - 1) * pageSize);
             
             var posts = (await _postRepo.GetAllAsync(p => p.Category, p => p.Author))
+                .Where(p => !p.IsDeleted && p.Status == PostStatus.Published)
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip(skip)
                 .Take(pageSize)

@@ -1,4 +1,4 @@
-﻿@model TechNews.Web.Models.HomeIndexViewModel
+@model TechNews.Web.Models.HomeIndexViewModel
 @{
     ViewData["Title"] = "TechNews - Tương lai công nghệ";
 }
@@ -171,7 +171,36 @@
             <!-- RIGHT COLUMN: Sidebar (4 cols) -->
             <aside class="lg:col-span-4 space-y-10">
                 
-
+                <!-- Latest Posts Widget -->
+                <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                    <h3 class="font-bold text-xl mb-6 relative inline-block">
+                        Bài viết mới nhất
+                        <span class="absolute bottom-0 left-0 w-full h-1 bg-emerald-500/20"></span>
+                    </h3>
+                    <div class="flex flex-col gap-5">
+                        @foreach (var post in Model.LatestPosts)
+                        {
+                            <article class="flex gap-3 group">
+                                @if (!string.IsNullOrEmpty(post.Thumbnail))
+                                {
+                                    <img src="@post.Thumbnail" alt="@post.Title" class="w-20 h-14 object-cover rounded-lg flex-shrink-0" />
+                                }
+                                else
+                                {
+                                    <div class="w-20 h-14 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center">
+                                        <i class="bi bi-image text-gray-300"></i>
+                                    </div>
+                                }
+                                <div class="min-w-0">
+                                    <h4 class="font-semibold text-sm leading-snug group-hover:text-[#2563eb] transition-colors line-clamp-2">
+                                        <a href="/post/@post.Slug">@post.Title</a>
+                                    </h4>
+                                    <span class="text-xs text-gray-400 mt-1 block">@post.CreatedDate.ToString("dd/MM/yyyy")</span>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                </div>
 
                 <!-- Most Viewed Widget -->
                 <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
@@ -210,7 +239,37 @@
                     </div>
                 </div>
 
-
+                <!-- Recent Comments Widget -->
+                @if (Model.RecentComments.Any())
+                {
+                    <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                        <h3 class="font-bold text-xl mb-6 relative inline-block">
+                            Bình luận gần đây
+                            <span class="absolute bottom-0 left-0 w-full h-1 bg-amber-500/20"></span>
+                        </h3>
+                        <div class="flex flex-col gap-5">
+                            @foreach (var comment in Model.RecentComments)
+                            {
+                                <div class="flex gap-3 group">
+                                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-0.5">
+                                        @(comment.UserName?.Substring(0, 1).ToUpper() ?? "?")
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="text-sm text-gray-700 leading-relaxed line-clamp-2">
+                                            <span class="font-semibold text-gray-900">@comment.UserName</span>
+                                            <span class="text-gray-400 mx-1">·</span>
+                                            <span class="text-xs text-gray-400">@comment.CreatedDate.ToString("dd/MM")</span>
+                                            <br/>@comment.Content
+                                        </p>
+                                        <a href="/post/@comment.PostSlug" class="text-xs text-[#2563eb] hover:underline mt-1 block line-clamp-1 font-medium">
+                                            <i class="bi bi-chat-quote text-[10px] mr-1"></i>@comment.PostTitle
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
 
             </aside>
 

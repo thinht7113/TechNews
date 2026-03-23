@@ -3,70 +3,105 @@
     ViewData["Title"] = ViewBag.CategoryName;
 }
 
-<div class="max-w-6xl mx-auto">
-    <!-- Header -->
+<div class="max-w-6xl mx-auto px-4 mt-6">
+    <div class="flex flex-col lg:flex-row gap-8">
+        
+        <!-- Left Main Content Area -->
+        <div class="w-full lg:w-[100%] xl:w-full">
+            
+            <div class="border-b-2 border-[#2563eb] pb-2 mb-6 inline-block w-full">
+                <h1 class="text-2xl font-bold text-[#b91c1c] uppercase flex items-center gap-2">
+                    @ViewData["Title"]
+                </h1>
+            </div>
 
-
-    @if (Model != null && Model.Any())
-    {
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @foreach (var post in Model)
+            @if (Model != null && Model.Any())
             {
-                <article class="flex flex-col h-full group">
-                    <div class="overflow-hidden rounded-xl shadow-sm mb-4 h-60 relative">
-                        <a href="/post/@post.Slug">
-                            <img src="@post.Thumbnail" alt="@post.Title" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                var featuredPost = Model.First();
+                var remainingPosts = Model.Skip(1).ToList();
+
+                <!-- Featured Post (Newest, Image Left, Large Text Right) -->
+                <article class="flex flex-col md:flex-row gap-6 pb-6 border-b border-gray-200 mb-6 group">
+                    <div class="w-full md:w-3/5 shrink-0">
+                        <a href="/post/@featuredPost.Slug" class="block overflow-hidden relative">
+                            <img src="@featuredPost.Thumbnail" alt="@featuredPost.Title" class="w-full aspect-[16/10] object-cover group-hover:scale-105 transition duration-500 bg-gray-100">
                         </a>
-                        <span class="absolute top-4 right-4 bg-white/90 backdrop-blur text-xs font-bold px-3 py-1 rounded-full text-gray-800 shadow-sm">
-                            <i class="bi bi-clock"></i> @post.CreatedDate.ToString("dd/MM")
-                        </span>
                     </div>
-                    
-                    <div class="flex-1 flex flex-col">
-                        <h2 class="text-xl font-bold text-gray-900 mb-3 font-serif leading-snug group-hover:text-primary transition">
-                            <a href="/post/@post.Slug">@post.Title</a>
+                    <div class="flex-1 flex flex-col justify-start">
+                        <h2 class="text-2xl md:text-3xl font-bold font-serif text-slate-900 mb-3 group-hover:text-[#2563eb] transition-colors leading-tight">
+                            <a href="/post/@featuredPost.Slug">@featuredPost.Title</a>
                         </h2>
-                        <p class="text-gray-600 line-clamp-3 mb-4 flex-grow text-sm leading-relaxed">@post.ShortDescription</p>
-                        
-                        <div class="mt-auto">
-                             <a href="/post/@post.Slug" class="inline-flex items-center text-primary font-medium hover:underline text-sm">
-                                Đọc tiếp <i class="bi bi-arrow-right ml-2"></i>
-                            </a>
+                        <p class="text-gray-700 text-base line-clamp-5 leading-relaxed">
+                            @featuredPost.ShortDescription
+                        </p>
+                        <div class="text-gray-400 text-xs mt-4 flex items-center gap-3">
+                            <span>@featuredPost.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
                         </div>
                     </div>
                 </article>
+
+                <!-- Remaining Posts (Smaller, Vertical List) -->
+                @if (remainingPosts.Any())
+                {
+                    <div class="flex flex-col gap-6">
+                        @foreach (var post in remainingPosts)
+                        {
+                            <article class="flex flex-col md:flex-row gap-5 pb-6 border-b border-gray-100 group">
+                                <div class="w-full md:w-1/3 shrink-0">
+                                    <a href="/post/@post.Slug" class="block overflow-hidden relative">
+                                        <img src="@post.Thumbnail" alt="@post.Title" class="w-full aspect-[16/10] object-cover group-hover:scale-105 transition duration-500 bg-gray-100">
+                                    </a>
+                                </div>
+                                <div class="flex-1 flex flex-col justify-start pt-1 md:pt-0">
+                                    <h2 class="text-[20px] font-bold font-serif text-slate-900 mb-2 group-hover:text-[#2563eb] transition-colors leading-snug">
+                                        <a href="/post/@post.Slug">@post.Title</a>
+                                    </h2>
+                                    <p class="text-gray-600 text-[15px] line-clamp-3 leading-relaxed mb-2">
+                                        @post.ShortDescription
+                                    </p>
+                                    <div class="text-gray-400 text-xs mt-auto flex items-center gap-3">
+                                        <span>@post.CreatedDate.ToString("dd/MM/yyyy")</span>
+                                    </div>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                }
+                
+                <!-- Pagination -->
+                @if (ViewBag.TotalPages > 1)
+                {
+                    <div class="mt-8 mb-12 flex justify-center gap-2">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <a href="?page=@(ViewBag.CurrentPage - 1)" class="w-8 h-8 md:w-10 md:h-10 rounded border border-gray-300 flex items-center justify-center text-gray-500 hover:bg-gray-50"><i class="bi bi-chevron-left"></i></a>
+                        }
+
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <a href="?page=@i" class="w-8 h-8 md:w-10 md:h-10 rounded flex items-center justify-center font-medium transition @(i == ViewBag.CurrentPage ? "bg-[#b91c1c] text-white outline-none" : "border border-gray-300 text-gray-600 hover:bg-gray-50")">
+                                @i
+                            </a>
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <a href="?page=@(ViewBag.CurrentPage + 1)" class="w-8 h-8 md:w-10 md:h-10 rounded border border-gray-300 flex items-center justify-center text-gray-500 hover:bg-gray-50"><i class="bi bi-chevron-right"></i></a>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-center py-20 bg-gray-50 border border-dashed border-gray-200">
+                    <div class="text-6xl text-gray-300 mb-4"><i class="bi bi-journal-x"></i></div>
+                    <h3 class="text-xl font-medium text-gray-600">Chưa có bài viết nào trong chuyên mục này.</h3>
+                    <a href="/" class="inline-block mt-4 text-[#2563eb] hover:underline">Về trang chủ</a>
+                </div>
             }
         </div>
         
-        <!-- Pagination -->
-        @if (ViewBag.TotalPages > 1)
-        {
-            <div class="mt-16 flex justify-center gap-2">
-                @if (ViewBag.CurrentPage > 1)
-                {
-                    <a href="?page=@(ViewBag.CurrentPage - 1)" class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:bg-gray-50"><i class="bi bi-chevron-left"></i></a>
-                }
-
-                @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                {
-                    <a href="?page=@i" class="w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition @(i == ViewBag.CurrentPage ? "bg-primary text-white scale-110" : "border border-gray-300 text-gray-600 hover:bg-gray-50")">
-                        @i
-                    </a>
-                }
-
-                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-                {
-                    <a href="?page=@(ViewBag.CurrentPage + 1)" class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:bg-gray-50"><i class="bi bi-chevron-right"></i></a>
-                }
-            </div>
-        }
-    }
-    else
-    {
-        <div class="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
-            <div class="text-6xl text-gray-300 mb-4"><i class="bi bi-journal-x"></i></div>
-            <h3 class="text-xl font-medium text-gray-600">Chưa có bài viết nào trong chuyên mục này.</h3>
-            <a href="/" class="inline-block mt-4 text-primary hover:underline">Về trang chủ</a>
-        </div>
-    }
+        
+        
+    </div>
 </div>

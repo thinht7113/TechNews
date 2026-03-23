@@ -1,0 +1,44 @@
+@model IEnumerable<TechNews.Domain.Entities.Post>
+@{
+    ViewData["Title"] = "Tin đã xem gần đây";
+    Layout = "_ProfileLayout";
+}
+
+<div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
+    <h1 class="text-2xl font-bold text-slate-800">Lịch sử đọc báo</h1>
+    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">@ViewBag.TotalCount bài viết</span>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-12 text-slate-500">
+        <i class="bi bi-clock-history text-4xl mb-3 block text-slate-300"></i>
+        <p>Lịch sử đọc trống.</p>
+    </div>
+}
+else
+{
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        @foreach (var post in Model)
+        {
+            <a href="/post/@post.Slug" class="flex gap-4 group bg-slate-50 rounded-xl p-3 border border-slate-100 hover:shadow-soft hover:bg-white transition-all duration-300">
+                <div class="w-24 h-24 rounded-lg overflow-hidden shrink-0">
+                    <img src="@post.Thumbnail" alt="@post.Title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='/images/placeholder.jpg'" />
+                </div>
+                <div class="flex flex-col justify-center">
+                    <span class="text-[10px] font-bold text-[#2563eb] mb-1">@post.Category?.Name</span>
+                    <h3 class="font-bold text-sm text-slate-900 group-hover:text-[#2563eb] transition-colors line-clamp-2 leading-snug">@post.Title</h3>
+                </div>
+            </a>
+        }
+    </div>
+
+    @if (ViewBag.TotalCount > 12)
+    {
+        <div class="mt-8 flex justify-center">
+            <a href="?page=@(ViewBag.CurrentPage + 1)" class="px-5 py-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-[#2563eb] hover:text-white transition-colors text-sm font-medium">
+                Tải thêm
+            </a>
+        </div>
+    }
+}

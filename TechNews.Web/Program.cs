@@ -51,7 +51,9 @@ builder.Services.AddScoped<TechNews.Application.Interfaces.IWorkflowService, Tec
 builder.Services.AddScoped<TechNews.Application.Interfaces.ISeoService, TechNews.Application.Services.SeoService>();
 builder.Services.AddScoped<TechNews.Application.Interfaces.IAnalyticsService, TechNews.Application.Services.AnalyticsService>();
 builder.Services.AddHttpClient<TechNews.Application.Interfaces.IAiService, TechNews.Application.Services.AiService>();
+builder.Services.AddHttpClient<TechNews.Application.Interfaces.IArticleScraperService, TechNews.Infrastructure.Services.VnExpressScraperService>();
 builder.Services.AddScoped<TechNews.Application.Interfaces.IStaticPageService, TechNews.Application.Services.StaticPageService>();
+builder.Services.AddScoped<TechNews.Application.Interfaces.IProfileService, TechNews.Application.Services.ProfileService>();
 builder.Services.AddHostedService<TechNews.Web.Services.ScheduledPublishService>();
 builder.Services.AddMemoryCache();
 
@@ -69,6 +71,8 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+app.UseStatusCodePagesWithReExecute("/Home/Error{0}");
 
 using (var scope = app.Services.CreateScope())
 {

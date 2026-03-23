@@ -1,4 +1,4 @@
-﻿import { ClassicEditor } from 'ckeditor5';
+import { ClassicEditor } from 'ckeditor5';
 import { editorConfig } from '../../utils/editor-config.js';
 
 const { ref, reactive, onMounted, computed, watch } = Vue;
@@ -50,12 +50,13 @@ export default {
             content: '',
             shortDescription: '',
             categoryId: '',
-            status: 1,
+            status: 0,
             metaTitle: '',
             metaDescription: '',
             tags: '',
             thumbnailFile: null,
-            thumbnailUrl: '' // For display in edit mode
+            thumbnailUrl: '', // For display in edit mode
+            scheduledPublishDate: null
         });
 
         const categories = ref([]);
@@ -175,6 +176,25 @@ export default {
         };
 
         const applyTitle = (title) => { form.title = title; };
+
+        // === AI Generate SEO Meta ===
+        const aiSuggestSeo = async () => {
+            if (!form.content) { Swal.fire('Cảnh báo', 'Chưa có nội dung bài viết', 'warning'); return; }
+            aiLoading.value = true;
+            try {
+                const res = await fetch('/api/ai/suggest-seo', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: form.content })
+                });
+                const data = await res.json();
+                if (data.success && data.meta) {
+                    form.metaTitle = data.meta.title;
+                    form.metaDescription = data.meta.description;
+                    Swal.fire({ icon: 'success', title: 'Đã tạo Meta SEO!', timer: 1500, showConfirmButton: false });
+                }
+            } catch (e) { Swal.fire('Lỗi', 'Không thể tạo chuẩn SEO Meta. Hệ thống có thể gặp lỗi phản hồi JSON.', 'error'); }
+            finally { aiLoading.value = false; }
+        };
 
         const aiImproveWriting = async () => {
             if (!form.content) { Swal.fire('Cảnh báo', 'Chưa có nội dung', 'warning'); return; }
@@ -297,6 +317,9 @@ export default {
                     form.metaDescription = data.metaDescription;
                     form.tags = data.tags;
                     form.thumbnailUrl = data.thumbnailUrl;
+                    if (data.scheduledPublishDate) {
+                        form.scheduledPublishDate = new Date(data.scheduledPublishDate).toISOString().slice(0, 16);
+                    }
                     if (data.thumbnailUrl) previewImage.value = data.thumbnailUrl;
                     fetchRevisions();
                 }
@@ -353,6 +376,7 @@ export default {
             formData.append('MetaTitle', form.metaTitle || '');
             formData.append('MetaDescription', form.metaDescription || '');
             formData.append('Tags', form.tags || '');
+            if (form.scheduledPublishDate) formData.append('ScheduledPublishDate', form.scheduledPublishDate);
             if (form.thumbnailFile) formData.append('ThumbnailFile', form.thumbnailFile);
             else if (form.thumbnailUrl) formData.append('ThumbnailUrl', form.thumbnailUrl);
             const url = isEdit.value ? `/api/post/update/${route.params.id}` : '/api/post/create';
@@ -365,6 +389,61 @@ export default {
             } catch (err) { Swal.fire('Lỗi server!', 'Vui lòng thử lại sau.', 'error'); }
             finally { isSubmitting.value = false; }
         };
+        // === VNEXPRESS SCRAPER ===
+        const scraperLoading = ref(false);
+        const scrapeFromUrl = async () => {
+            const { value: url } = await Swal.fire({
+                title: '<i class="bi bi-globe2 text-blue-500"></i> Lấy bài từ VnExpress',
+                input: 'url',
+                inputPlaceholder: 'https://vnexpress.net/bai-viet-4851449.html',
+                showCancelButton: true,
+                confirmButtonText: '<i class="bi bi-download"></i> Lấy nội dung',
+                cancelButtonText: 'Hủy',
+                confirmButtonColor: '#f97316',
+                inputValidator: (val) => {
+                    if (!val) return 'Vui lòng nhập URL';
+                    if (!val.includes('vnexpress.net')) return 'Chỉ hỗ trợ link vnexpress.net';
+                },
+                customClass: { popup: 'rounded-xl' }
+            });
+            if (!url) return;
+
+            scraperLoading.value = true;
+            try {
+                const res = await fetch('/api/post/scrape-url', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    form.title = data.title || '';
+                    form.shortDescription = data.shortDescription || '';
+                    form.tags = data.tags || '';
+                    if (data.thumbnailUrl) {
+                        form.thumbnailUrl = data.thumbnailUrl;
+                        previewImage.value = data.thumbnailUrl;
+                    }
+                    if (data.content && editorInstance) {
+                        editorInstance.setData(data.content);
+                        form.content = data.content;
+                    }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Đã lấy nội dung!',
+                        html: `<p class="text-sm text-gray-500">Tiêu đề: <strong>${data.title}</strong></p>`,
+                        timer: 2500,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire('Lỗi', data.message || 'Không thể lấy nội dung bài viết.', 'error');
+                }
+            } catch (err) {
+                Swal.fire('Lỗi kết nối', 'Không thể kết nối server.', 'error');
+            } finally {
+                scraperLoading.value = false;
+            }
+        };
 
         return {
             form, categories, previewImage, handleFileUpload, removeImage, submitForm,
@@ -373,10 +452,12 @@ export default {
             // AI
             aiConfigured, aiLoading, aiResult, aiSuggestedTags, aiSuggestedTitles,
             showAiPanel, aiGenerate, aiSummarize, aiSuggestTags, applyTag,
-            aiSuggestTitles, applyTitle, aiImproveWriting,
+            aiSuggestTitles, applyTitle, aiImproveWriting, aiSuggestSeo,
             // SEO
             seoAnalysis, seoLoading, focusKeyword, analyzeSeo, displayScore,
-            seoScoreColor, seoScore
+            seoScoreColor, seoScore,
+            // Scraper
+            scraperLoading, scrapeFromUrl
         };
     },
     template: `
@@ -388,13 +469,21 @@ export default {
                     </router-link>
                     <h2 class="text-2xl font-bold text-black">{{ isEdit ? 'Chỉnh sửa bài viết' : 'Thêm bài viết mới' }}</h2>
                 </div>
-                <!-- AI Toggle Button -->
-                <button v-if="aiConfigured" @click="showAiPanel = !showAiPanel"
+                <div class="flex items-center gap-2">
+                    <!-- VnExpress Scraper Button -->
+                    <button v-if="false" type="button" @click="scrapeFromUrl" :disabled="scraperLoading"
+                        class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md hover:shadow-lg hover:from-orange-600 hover:to-red-600 disabled:opacity-60">
+                        <i class="bi" :class="scraperLoading ? 'bi-arrow-repeat animate-spin' : 'bi-newspaper'"></i>
+                        {{ scraperLoading ? 'Đang lấy...' : 'Lấy từ VnExpress' }}
+                    </button>
+                    <!-- AI Toggle Button -->
+                    <button v-if="aiConfigured" @click="showAiPanel = !showAiPanel"
                     class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
                     :class="showAiPanel ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-200' : 'bg-white border border-stroke text-slate-600 hover:border-purple-400 hover:text-purple-600'">
                     <i class="bi bi-stars"></i>
                     {{ showAiPanel ? 'Ẩn AI Assistant' : 'AI Assistant' }}
                 </button>
+                </div>
             </div>
             <div v-if="isLoading">Đang tải dữ liệu...</div>
             <form v-else @submit.prevent="submitForm" class="grid grid-cols-1 gap-6" :class="showAiPanel ? 'lg:grid-cols-12' : 'lg:grid-cols-3'">
@@ -417,7 +506,13 @@ export default {
                         <textarea v-model="form.shortDescription" rows="3" class="w-full border border-stroke rounded p-2 text-sm focus:border-primary outline-none"></textarea>
                      </div>
                      <div class="rounded-sm border border-stroke bg-white shadow-sm p-4">
-                        <h4 class="font-bold text-black mb-2">SEO Meta (Tùy chọn)</h4>
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-bold text-black">SEO Meta (Tùy chọn)</h4>
+                            <button v-if="aiConfigured" type="button" @click="aiSuggestSeo" :disabled="aiLoading"
+                                class="text-xs flex items-center gap-1 text-purple-600 hover:text-purple-800 disabled:opacity-50">
+                                <i class="bi bi-stars"></i> <span v-if="!aiLoading">AI tự động</span><span v-else>Đang tạo...</span>
+                            </button>
+                        </div>
                          <div class="grid grid-cols-1 gap-4">
                             <input v-model="form.metaTitle" type="text" placeholder="Meta Title" class="w-full rounded border border-stroke px-4 py-2 text-sm focus:border-primary outline-none" />
                             <textarea v-model="form.metaDescription" rows="2" placeholder="Meta Description" class="w-full rounded border border-stroke px-4 py-2 text-sm focus:border-primary outline-none"></textarea>
@@ -445,10 +540,28 @@ export default {
                 <!-- Sidebar (Right) -->
                 <div :class="showAiPanel ? 'lg:col-span-3' : ''" class="flex flex-col gap-6">
                     <div class="rounded-sm border border-stroke bg-white shadow-sm p-4">
-                        <h4 class="font-bold text-black mb-3 border-b border-stroke pb-2">Đăng bài</h4>
-                        <div class="flex justify-between items-center pt-3 border-t border-stroke">
-                             <span class="text-sm font-bold text-black">{{ form.status === 1 ? 'Công khai' : 'Nháp' }}</span>
-                            <button type="submit" :disabled="isSubmitting" class="bg-primary text-white py-2 px-4 rounded font-medium hover:bg-opacity-90 disabled:opacity-70">
+                        <h4 class="font-bold text-black mb-3 border-b border-stroke pb-2">Đăng bài / Workflow</h4>
+                        <div class="space-y-4 pt-2">
+                             <div>
+                                <label class="mb-2 block text-sm font-medium text-black">Trạng thái</label>
+                                <select v-model="form.status" class="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-3 text-sm font-medium outline-none transition focus:border-primary active:border-primary">
+                                    <option :value="0">Bản nháp</option>
+                                    <option :value="4">Chờ duyệt</option>
+                                    <option :value="1">Đã xuất bản</option>
+                                    <option :value="6">Từ chối</option>
+                                    <option :value="7">Đã lên lịch</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="mb-2 block text-sm font-medium text-black">Hẹn giờ xuất bản</label>
+                                <input type="datetime-local" v-model="form.scheduledPublishDate" class="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-3 text-sm font-medium outline-none transition focus:border-primary active:border-primary" />
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center mt-4 pt-3 border-t border-stroke">
+                            <span class="text-sm font-bold" :class="[0, 1].includes(form.status) ? 'text-black' : (form.status == 4 ? 'text-amber-500' : 'text-blue-600')">
+                                {{ form.status == 0 ? 'Nháp' : (form.status == 4 ? 'Chờ duyệt' : (form.status == 5 ? 'Đang duyệt' : (form.status == 1 ? 'Đã X.Bản' : 'Trạng thái khác'))) }}
+                            </span>
+                            <button type="submit" :disabled="isSubmitting" class="bg-primary text-white py-2 px-4 rounded text-sm font-medium hover:bg-opacity-90 disabled:opacity-70">
                                 {{ isSubmitting ? 'Lưu...' : (isEdit ? 'Cập nhật' : 'Đăng ngay') }}
                             </button>
                         </div>

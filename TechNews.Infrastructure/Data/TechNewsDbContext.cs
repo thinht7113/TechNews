@@ -24,8 +24,8 @@ namespace TechNews.Infrastructure.Data
         public DbSet<WorkflowLog> WorkflowLogs { get; set; }
         public DbSet<PageView> PageViews { get; set; }
         public DbSet<StaticPage> StaticPages { get; set; }
-
-
+        public DbSet<SavedPost> SavedPosts { get; set; }
+        public DbSet<UserPostHistory> UserPostHistories { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -106,6 +106,24 @@ namespace TechNews.Infrastructure.Data
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
+
+            builder.Entity<SavedPost>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Post).WithMany().HasForeignKey(e => e.PostId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasIndex(e => new { e.UserId, e.PostId }).IsUnique();
+            });
+
+            builder.Entity<UserPostHistory>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Post).WithMany().HasForeignKey(e => e.PostId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasIndex(e => new { e.UserId, e.PostId }).IsUnique();
+            });
+            
+            // Default users/roles limit logic...
         }
     }
 }

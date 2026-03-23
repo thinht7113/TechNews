@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +10,13 @@ namespace TechNews.Web.Areas.Identity.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<User> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<LoginModel> logger)
         {
             _signInManager = signInManager;
+            _userManager = userManager;
             _logger = logger;
         }
 
@@ -23,6 +25,8 @@ namespace TechNews.Web.Areas.Identity.Pages.Account
 
         public string ReturnUrl { get; set; }
         public string ErrorMessage { get; set; }
+        
+        public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
         public class InputModel
         {
@@ -46,8 +50,9 @@ namespace TechNews.Web.Areas.Identity.Pages.Account
             }
 
             returnUrl ??= Url.Content("~/");
-
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+
+            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             ReturnUrl = returnUrl;
         }
@@ -58,9 +63,18 @@ namespace TechNews.Web.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                var user = await _userManager.FindByEmailAsync(Input.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Đăng nhập thất bại. Kiểm tra lại email hoặc mật khẩu.");
+                    ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                    return Page();
+                }
+
+                var result = await _signInManager.CheckPasswordSignInAsync(user, Input.Password, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
+                    await _signInManager.SignInAsync(user, isPersistent: Input.RememberMe);
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl ?? "/");
                 }
@@ -76,10 +90,12 @@ namespace TechNews.Web.Areas.Identity.Pages.Account
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Đăng nhập thất bại. Kiểm tra lại email hoặc mật khẩu.");
+                    ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
                     return Page();
                 }
             }
 
+            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             return Page();
         }
     }
